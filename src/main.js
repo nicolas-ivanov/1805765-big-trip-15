@@ -7,6 +7,8 @@ import {tripPoint, createTripListTemplate} from './view/trip-point.js';
 import {newPointForm} from './view/add-new-point.js';
 import {editTripPointForm} from './view/edit-point.js';
 
+const POINTS_COUNT = 3;
+
 const render = (container, template, place) => {
   container.insertAdjacentHTML(place, template);
 };
@@ -27,7 +29,9 @@ render(siteEventsElement, createTripListTemplate(), 'beforeend');
 
 const siteEventsListElement = document.querySelector('.trip-events__list');
 render(siteEventsListElement, newPointForm(), 'beforeend');
-render(siteEventsListElement, tripPoint(), 'beforeend');
-render(siteEventsListElement, tripPoint(), 'beforeend');
-render(siteEventsListElement, tripPoint(), 'beforeend');
+
+for (let i = 0; i < POINTS_COUNT; i++) {
+    render(siteEventsListElement, tripPoint(), 'beforeend');
+}
+
 render(siteEventsListElement, editTripPointForm(), 'beforeend');
