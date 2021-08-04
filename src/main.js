@@ -1,11 +1,11 @@
-import {siteMenu} from './view/site-menu.js';
-import {siteFilters} from './view/filters.js';
-import {tripInfo} from './view/trip-info.js';
-import {tripCost} from './view/trip-cost.js';
-import {sortingForm} from './view/sorting.js';
-import {tripPoint, createTripListTemplate} from './view/trip-point.js';
-import {newPointForm} from './view/add-new-point.js';
-import {editTripPointForm} from './view/edit-point.js';
+import { siteMenu } from './view/site-menu.js';
+import { siteFilters } from './view/filters.js';
+import { tripInfo } from './view/trip-info.js';
+import { tripCost } from './view/trip-cost.js';
+import { sortingForm } from './view/sorting.js';
+import { tripPoint } from './view/trip-point.js';
+import { newPointForm } from './view/add-new-point.js';
+import { editTripPointForm } from './view/edit-point.js';
 
 const POINTS_COUNT = 3;
 
@@ -24,14 +24,13 @@ const siteTripInfoElement = siteHeaderElement.querySelector('.trip-main__trip-in
 render(siteTripInfoElement, tripCost(), 'beforeend');
 
 const siteEventsElement = document.querySelector('.trip-events');
-render(siteEventsElement, sortingForm(), 'beforeend');
-render(siteEventsElement, createTripListTemplate(), 'beforeend');
+render(siteEventsElement, sortingForm(), 'afterbegin');
 
 const siteEventsListElement = document.querySelector('.trip-events__list');
 render(siteEventsListElement, newPointForm(), 'beforeend');
 
 for (let i = 0; i < POINTS_COUNT; i++) {
-    render(siteEventsListElement, tripPoint(), 'beforeend');
+  render(siteEventsListElement, tripPoint(), 'beforeend');
 }
 
 render(siteEventsListElement, editTripPointForm(), 'beforeend');
