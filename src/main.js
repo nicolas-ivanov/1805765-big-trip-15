@@ -1,55 +1,67 @@
-import { siteMenu } from './view/site-menu.js';
-import { siteFilters } from './view/filters.js';
-import { tripInfo } from './view/trip-info.js';
-import { tripCost } from './view/trip-cost.js';
-import { sortingForm } from './view/sorting.js';
-import { tripPoint } from './view/trip-point.js';
-import { newPointForm } from './view/add-new-point.js';
-import { editTripPointForm } from './view/edit-point.js';
-import { generatedPoints, emptyPoint } from './fixtures.js';
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
+import { renderElement, RenderPosition } from './utils.js';
+import SiteMenu from './view/site-menu.js';
+import Filters from './view/filters.js';
+import TripInfo from './view/trip-info.js';
+import Sorting from './view/sorting.js';
+import TripPoint from './view/trip-point.js';
+import NoPoints from './view/no-points.js';
+import EditTripPointForm from './view/edit-point.js';
+import { generatedPoints } from './fixtures.js';
 
 const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
-
-render(siteTripControlsElement, siteMenu(), 'afterbegin');
-render(siteTripControlsElement, siteFilters(), 'beforeend');
-render(siteHeaderElement, tripInfo(generatedPoints), 'afterbegin');
-
-const siteTripInfoElement = siteHeaderElement.querySelector('.trip-main__trip-info');
-render(siteTripInfoElement, tripCost(generatedPoints), 'beforeend');
-
 const siteEventsElement = document.querySelector('.trip-events');
-render(siteEventsElement, sortingForm(), 'afterbegin');
 
-const siteEventsListElement = document.querySelector('.trip-events__list');
-render(siteEventsListElement, newPointForm(emptyPoint), 'beforeend');
+const renderPoint = (pointContainerElement, point) => {
+  const pointElement = new TripPoint(point).getElement();
+  const pointFormElement = new EditTripPointForm(point).getElement();
 
-const rollDownButtonHandler = ({ target }) => {
-  const pointInfo = document.getElementById('trip-point-short-info_' + target.dataset.pointId);
-  pointInfo.classList.toggle('visually-hidden');
+  const replaceCardToForm = () => {
+    pointContainerElement.replaceChild(pointFormElement, pointElement);
+  };
 
-  const pointDetails = document.getElementById('trip-point-detailed-info_' + target.dataset.pointId);
-  pointDetails.classList.toggle('visually-hidden');
+  const replaceFormToCard = () => {
+    pointContainerElement.replaceChild(pointElement, pointFormElement);
+  };
+
+  const onEscKeyDown = (evt) => {
+    if (evt.key === 'Escape' || evt.key === 'Esc') {
+      evt.preventDefault();
+      replaceFormToCard();
+      document.removeEventListener('keydown', onEscKeyDown);
+    }
+  };
+
+  const rollDownButton = pointElement.querySelector('.event__rollup-btn');
+  rollDownButton.addEventListener('click', () => {
+    replaceCardToForm();
+    document.addEventListener('keydown', onEscKeyDown);
+  });
+
+  const rollUpButton = pointFormElement.querySelector('.event__rollup-btn');
+  rollUpButton.addEventListener('click', replaceFormToCard);
+
+  pointFormElement.addEventListener('submit', (evt) => {
+    evt.preventDefault();
+    replaceFormToCard();
+    document.removeEventListener('keydown', onEscKeyDown);
+  });
+
+  renderElement(pointContainerElement, pointElement, RenderPosition.BEFOREEND);
 };
 
-generatedPoints.forEach((point, index) => {
-  const idShort = 'trip-point-short-info_' + index;
-  render(siteEventsListElement, tripPoint(point, idShort), 'beforeend');
+const renderTripList = (tripListContainer, tripPoints) => {
+  if (generatedPoints.length === 0) {
+    renderElement(siteEventsElement, new NoPoints().getElement(), RenderPosition.AFTERBEGIN);
+  } else {
+    renderElement(siteEventsElement, new Sorting().getElement(), RenderPosition.AFTERBEGIN);
 
-  const pointElement = document.getElementById(idShort);
-  const rollDownButton = pointElement.querySelector('.event__rollup-btn');
-  rollDownButton.dataset.pointId = index;
-  rollDownButton.addEventListener('click', rollDownButtonHandler);
+    const siteEventsListElement = tripListContainer.querySelector('.trip-events__list');
+    tripPoints.forEach(point => renderPoint(siteEventsListElement, point));
+  }
+};
 
-  const idDetails = 'trip-point-detailed-info_' + index;
-  render(siteEventsListElement, editTripPointForm(point, idDetails), 'beforeend');
-
-  const pointInfoElement = document.getElementById(idDetails);
-  const rollUpButton = pointInfoElement.querySelector('.event__rollup-btn');
-  rollUpButton.dataset.pointId = index;
-  rollUpButton.addEventListener('click', rollDownButtonHandler);
-});
+renderElement(siteTripControlsElement, new SiteMenu().getElement(), RenderPosition.AFTERBEGIN);
+renderElement(siteTripControlsElement, new Filters().getElement(), RenderPosition.BEFOREEND);
+renderElement(siteHeaderElement, new TripInfo(generatedPoints).getElement(), RenderPosition.AFTERBEGIN);
+renderTripList(siteEventsElement, generatedPoints);

@@ -1,44 +1,52 @@
 import dayjs from 'dayjs';
 import { cities, extraOptions } from '../fixtures.js';
 
-const getOffersDisplay = (defaultOffers, selectedOffers) => {
-  if (selectedOffers == null) {
-    return '';
+import { createElement } from '../utils.js';
+
+export default class NewPointForm {
+  constructor (pointData) {
+    this._pointData = pointData;
+    this._element = null;
   }
-  const selectedOffersIDs = selectedOffers.map(offer => offer.id);
 
-  return defaultOffers.map((offer) => {
-    return `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" 
-      type="checkbox" name="event-offer-${offer.id}" ${selectedOffersIDs.includes(offer.id) ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-${offer.id}">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </label>
-    </div>`;
-  }).join('');
-};
+  _getOffersTemplate (defaultOffers, selectedOffers) {
+    if (selectedOffers == null) {
+      return '';
+    }
+    const selectedOffersIDs = selectedOffers.map(offer => offer.id);
 
-const getPhotosDisplay = (photos) => {
-  if (photos == null) {
-    return '';
-  }
-  return photos.map(photo => (
-    `<img class="event__photo" src='${photo}' alt="Event photo">`
-  )).join('');
-};
+    return defaultOffers.map((offer) => {
+      return `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" 
+        type="checkbox" name="event-offer-${offer.id}" ${selectedOffersIDs.includes(offer.id) ? 'checked' : ''}>
+        <label class="event__offer-label" for="event-offer-${offer.id}">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offer.price}</span>
+        </label>
+      </div>`;
+    }).join('');
+  };
 
-export const newPointForm = (pointData) => {
-  const startTime = pointData.startTime ? dayjs(pointData.startTime).format('DD/MM/YY HH:mm') : '';
-  const endTime = pointData.endTime ? dayjs(pointData.endTime).format('DD/MM/YY HH:mm') : '';
+  _getPhotosTemplate (photos) {
+    if (photos == null) {
+      return '';
+    }
+    return photos.map(photo => (
+      `<img class="event__photo" src='${photo}' alt="Event photo">`
+    )).join('');
+  };
 
-  return (`<form class="event event--edit" action="#" method="post">
+  getTemplate () {
+    const startTime = this._pointData.startTime ? dayjs(this._pointData.startTime).format('DD/MM/YY HH:mm') : '';
+    const endTime = this._pointData.endTime ? dayjs(this._pointData.endTime).format('DD/MM/YY HH:mm') : '';
+
+    return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${pointData.pointType}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${this._pointData.pointType}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -101,9 +109,9 @@ export const newPointForm = (pointData) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${pointData.pointType}
+          ${this._pointData.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointData.destination ? pointData.destination : ''}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._pointData.destination ? this._pointData.destination : ''}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${cities.map((city) => ('<option value="' + city + '"></option>')).join('')}
         </datalist>
@@ -122,7 +130,7 @@ export const newPointForm = (pointData) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${pointData.basePrice ? pointData.basePrice : ''}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._pointData.basePrice ? this._pointData.basePrice : ''}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -133,20 +141,33 @@ export const newPointForm = (pointData) => {
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          ${getOffersDisplay(extraOptions[pointData.pointType], pointData.offers)}
+          ${this._getOffersTemplate(extraOptions[this._pointData.pointType], this._pointData.offers)}
         </div>
       </section>
 
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${pointData.description ? pointData.description : ''}</p>
+        <p class="event__destination-description">${this._pointData.description ? this._pointData.description : ''}</p>
 
         <div class="event__photos-container">
           <div class="event__photos-tape">
-            ${getPhotosDisplay(pointData.photos)}
+            ${this._getPhotosTemplate(this._pointData.photos)}
           </div>
         </div>
       </section>
     </section>
-  </form>`);
-};
+  </form>`;
+  }
+
+  getElement () {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement () {
+    this._element = null;
+  }
+}

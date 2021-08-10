@@ -1,32 +1,40 @@
 import dayjs from 'dayjs';
 import { cities, extraOptions } from '../fixtures.js';
+import { createElement } from '../utils.js';
 
-const getOffersDisplay = (defaultOffers, selectedOffers) => {
-  const selectedOffersIDs = selectedOffers.map(offer => offer.id);
+export default class EditTripPointForm {
+  constructor (pointData, pointId) {
+    this._pointData = pointData;
+    this._pointId = pointId;
+    this._element = null;
+  }
 
-  return defaultOffers.map((offer) => {
-    return `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" 
-      type="checkbox" name="event-offer-${offer.id}" ${selectedOffersIDs.includes(offer.id) ? 'checked' : ''}>
-      <label class="event__offer-label" for="event-offer-${offer.id}">
-        <span class="event__offer-title">${offer.title}</span>
-        &plus;&euro;&nbsp;
-        <span class="event__offer-price">${offer.price}</span>
-      </label>
-    </div>`;
-  }).join('');
-};
+  _getOffersDisplay (defaultOffers, selectedOffers) {
+    const selectedOffersIDs = selectedOffers.map(offer => offer.id);
 
-export const editTripPointForm = (pointData, id) => {
-  const startTime = dayjs(pointData.startTime);
-  const endTime = dayjs(pointData.endTime);
+    return defaultOffers.map((offer) => {
+      return `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" 
+        type="checkbox" name="event-offer-${offer.id}" ${selectedOffersIDs.includes(offer.id) ? 'checked' : ''}>
+        <label class="event__offer-label" for="event-offer-${offer.id}">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offer.price}</span>
+        </label>
+      </div>`;
+    }).join('');
+  };
 
-  return (`<form id="${id}" class="event event--edit visually-hidden" action="#" method="post">
+  getTemplate () {
+    const startTime = dayjs(this._pointData.startTime);
+    const endTime = dayjs(this._pointData.endTime);
+
+    return `<form id="${this._pointId}" class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${pointData.pointType}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${this._pointData.pointType}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -89,9 +97,9 @@ export const editTripPointForm = (pointData, id) => {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${pointData.pointType}
+          ${this._pointData.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${pointData.destination}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._pointData.destination}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${cities.map((city) => ('<option value="' + city + '"></option>')).join('')}
         </datalist>
@@ -110,7 +118,7 @@ export const editTripPointForm = (pointData, id) => {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${pointData.basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._pointData.basePrice}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -124,15 +132,27 @@ export const editTripPointForm = (pointData, id) => {
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          ${getOffersDisplay(extraOptions[pointData.pointType], pointData.offers)}
+          ${this._getOffersDisplay(extraOptions[this._pointData.pointType], this._pointData.offers)}
         </div>
       </section>
 
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${pointData.description}</p>
+        <p class="event__destination-description">${this._pointData.description}</p>
       </section>
     </section>
-  </form>`
-  );
-};
+  </form>`;
+  }
+
+  getElement () {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement () {
+    this._element = null;
+  }
+}
