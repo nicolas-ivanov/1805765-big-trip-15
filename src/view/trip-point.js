@@ -1,37 +1,46 @@
-import { createElement } from '../utils.js';
 import dayjs from 'dayjs';
+import AbstractView from './abstract.js';
 import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-export default class TripPoint {
+export default class TripPoint extends AbstractView {
   constructor (pointData, pointId) {
+    super();
     this._pointData = pointData;
     this._pointId = pointId;
-    this._element = null;
+    this._clickHandler = this._clickHandler.bind(this);
+  }
+
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
+  }
+
+  setClickHandler(callback) {
+    this._callback.click = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
   }
 
   _getTimeDiffDisplay (startTime, endTime) {
-    const duration = dayjs.duration(endTime.diff(startTime));
+    const durationObj = dayjs.duration(endTime.diff(startTime));
 
-    if (duration.hours() < 1) {
-      return duration.format('mm[M]');
-    } else if (duration.hours() < 24) {
-      return duration.format('HH[H] mm[M]');
+    if (durationObj.hours() < 1) {
+      return durationObj.format('mm[M]');
+    } else if (durationObj.hours() < 24) {
+      return durationObj.format('HH[H] mm[M]');
     } else {
-      return duration.format('dd[D] HH[H] mm[M]');
+      return durationObj.format('dd[D] HH[H] mm[M]');
     }
-  };
+  }
 
   _getOffersDisplay (offers) {
-    return offers.map((offer) => {
-      return `<li class="event__offer">
+    return offers.map((offer) => `<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${offer.price}</span>
-      </li>`;
-    }).join('');
-  };
+      </li>`).join('');
+  }
 
   getTemplate () {
     const startTime = dayjs(this._pointData.startTime);
@@ -70,17 +79,5 @@ export default class TripPoint {
     </button>
     </div>
     </li>`;
-  }
-
-  getElement () {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement () {
-    this._element = null;
   }
 }

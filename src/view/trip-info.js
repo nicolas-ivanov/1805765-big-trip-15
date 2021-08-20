@@ -1,15 +1,16 @@
 import dayjs from 'dayjs';
-import { createElement, add } from '../utils.js';
+import AbstractView from './abstract.js';
+import { add } from '../utils/common.js';
 
-export default class TripInfo {
+export default class TripInfo extends AbstractView {
   constructor (tripPoints) {
+    super();
     this._tripPoints = tripPoints;
-    this._element = null;
   }
 
   _getOffersSumPrice (offers) {
-    return offers.map(offer => offer.price).reduce(add, 0);
-  };
+    return offers.map((offer) => offer.price).reduce(add, 0);
+  }
 
   getTemplate () {
     let [startTime, endTime] = [null, null];
@@ -30,21 +31,9 @@ export default class TripInfo {
     </div>
       <p class="trip-info__cost">
       Total: &euro;&nbsp;<span class="trip-info__cost-value">
-      ${this._tripPoints.map(point => point.basePrice + this._getOffersSumPrice(point.offers)).reduce(add, 0)}
+      ${this._tripPoints.map((point) => point.basePrice + this._getOffersSumPrice(point.offers)).reduce(add, 0)}
       </span>
     </p>
   </section>`;
-  }
-
-  getElement () {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement () {
-    this._element = null;
   }
 }

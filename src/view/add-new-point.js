@@ -1,22 +1,20 @@
 import dayjs from 'dayjs';
+import AbstractView from './abstract.js';
 import { cities, extraOptions } from '../fixtures.js';
 
-import { createElement } from '../utils.js';
-
-export default class NewPointForm {
+export default class NewPointForm extends AbstractView {
   constructor (pointData) {
+    super();
     this._pointData = pointData;
-    this._element = null;
   }
 
   _getOffersTemplate (defaultOffers, selectedOffers) {
-    if (selectedOffers == null) {
+    if (selectedOffers === null) {
       return '';
     }
-    const selectedOffersIDs = selectedOffers.map(offer => offer.id);
+    const selectedOffersIDs = selectedOffers.map((offer) => offer.id);
 
-    return defaultOffers.map((offer) => {
-      return `<div class="event__offer-selector">
+    return defaultOffers.map((offer) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" 
         type="checkbox" name="event-offer-${offer.id}" ${selectedOffersIDs.includes(offer.id) ? 'checked' : ''}>
         <label class="event__offer-label" for="event-offer-${offer.id}">
@@ -24,18 +22,17 @@ export default class NewPointForm {
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${offer.price}</span>
         </label>
-      </div>`;
-    }).join('');
-  };
+      </div>`).join('');
+  }
 
   _getPhotosTemplate (photos) {
-    if (photos == null) {
+    if (photos === null) {
       return '';
     }
-    return photos.map(photo => (
+    return photos.map((photo) => (
       `<img class="event__photo" src='${photo}' alt="Event photo">`
     )).join('');
-  };
+  }
 
   getTemplate () {
     const startTime = this._pointData.startTime ? dayjs(this._pointData.startTime).format('DD/MM/YY HH:mm') : '';
@@ -113,7 +110,7 @@ export default class NewPointForm {
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._pointData.destination ? this._pointData.destination : ''}" list="destination-list-1">
         <datalist id="destination-list-1">
-          ${cities.map((city) => ('<option value="' + city + '"></option>')).join('')}
+          ${cities.map((city) => (`<option value="${  city  }"></option>`)).join('')}
         </datalist>
       </div>
 
@@ -157,17 +154,5 @@ export default class NewPointForm {
       </section>
     </section>
   </form>`;
-  }
-
-  getElement () {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement () {
-    this._element = null;
   }
 }

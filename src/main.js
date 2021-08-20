@@ -1,4 +1,4 @@
-import { renderElement, RenderPosition } from './utils.js';
+import { render, replace, RenderPosition } from './utils/render.js';
 import SiteMenu from './view/site-menu.js';
 import Filters from './view/filters.js';
 import TripInfo from './view/trip-info.js';
@@ -13,15 +13,15 @@ const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls_
 const siteEventsElement = document.querySelector('.trip-events');
 
 const renderPoint = (pointContainerElement, point) => {
-  const pointElement = new TripPoint(point).getElement();
-  const pointFormElement = new EditTripPointForm(point).getElement();
+  const pointElement = new TripPoint(point);
+  const pointFormElement = new EditTripPointForm(point);
 
   const replaceCardToForm = () => {
-    pointContainerElement.replaceChild(pointFormElement, pointElement);
+    replace(pointFormElement, pointElement);
   };
 
   const replaceFormToCard = () => {
-    pointContainerElement.replaceChild(pointElement, pointFormElement);
+    replace(pointElement, pointFormElement);
   };
 
   const onEscKeyDown = (evt) => {
@@ -32,36 +32,33 @@ const renderPoint = (pointContainerElement, point) => {
     }
   };
 
-  const rollDownButton = pointElement.querySelector('.event__rollup-btn');
-  rollDownButton.addEventListener('click', () => {
+  pointElement.setClickHandler(() => {
     replaceCardToForm();
     document.addEventListener('keydown', onEscKeyDown);
   });
 
-  const rollUpButton = pointFormElement.querySelector('.event__rollup-btn');
-  rollUpButton.addEventListener('click', replaceFormToCard);
+  pointFormElement.setClickHandler(replaceFormToCard);
 
-  pointFormElement.addEventListener('submit', (evt) => {
-    evt.preventDefault();
+  pointFormElement.setSubmitHandler(() => {
     replaceFormToCard();
     document.removeEventListener('keydown', onEscKeyDown);
   });
 
-  renderElement(pointContainerElement, pointElement, RenderPosition.BEFOREEND);
+  render(pointContainerElement, pointElement, RenderPosition.BEFOREEND);
 };
 
 const renderTripList = (tripListContainer, tripPoints) => {
   if (generatedPoints.length === 0) {
-    renderElement(siteEventsElement, new NoPoints().getElement(), RenderPosition.AFTERBEGIN);
+    render(siteEventsElement, new NoPoints().getElement(), RenderPosition.AFTERBEGIN);
   } else {
-    renderElement(siteEventsElement, new Sorting().getElement(), RenderPosition.AFTERBEGIN);
+    render(siteEventsElement, new Sorting().getElement(), RenderPosition.AFTERBEGIN);
 
     const siteEventsListElement = tripListContainer.querySelector('.trip-events__list');
-    tripPoints.forEach(point => renderPoint(siteEventsListElement, point));
+    tripPoints.forEach((point) => renderPoint(siteEventsListElement, point));
   }
 };
 
-renderElement(siteTripControlsElement, new SiteMenu().getElement(), RenderPosition.AFTERBEGIN);
-renderElement(siteTripControlsElement, new Filters().getElement(), RenderPosition.BEFOREEND);
-renderElement(siteHeaderElement, new TripInfo(generatedPoints).getElement(), RenderPosition.AFTERBEGIN);
+render(siteTripControlsElement, new SiteMenu().getElement(), RenderPosition.AFTERBEGIN);
+render(siteTripControlsElement, new Filters().getElement(), RenderPosition.BEFOREEND);
+render(siteHeaderElement, new TripInfo(generatedPoints).getElement(), RenderPosition.AFTERBEGIN);
 renderTripList(siteEventsElement, generatedPoints);
