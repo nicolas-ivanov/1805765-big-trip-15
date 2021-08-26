@@ -5,11 +5,11 @@ import duration from 'dayjs/plugin/duration';
 dayjs.extend(duration);
 
 export default class TripPointView extends AbstractView {
-  constructor (pointData, pointId) {
+  constructor (pointData) {
     super();
     this._pointData = pointData;
-    this._pointId = pointId;
     this._clickHandler = this._clickHandler.bind(this);
+    this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
   _clickHandler(evt) {
@@ -20,6 +20,16 @@ export default class TripPointView extends AbstractView {
   setClickHandler(callback) {
     this._callback.click = callback;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
+  }
+
+  _favoriteClickHandler(evt) {
+    evt.preventDefault();
+    this._callback.favoriteClick();
+  }
+
+  setFavoriteClickHandler(callback) {
+    this._callback.favoriteClick = callback;
+    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
   }
 
   _getTimeDiffDisplay (startTime, endTime) {
@@ -46,7 +56,7 @@ export default class TripPointView extends AbstractView {
     const startTime = dayjs(this._pointData.startTime);
     const endTime = dayjs(this._pointData.endTime);
 
-    return `<li id="${this._pointId}" class="trip-events__item">
+    return `<li class="trip-events__item">
     <div class="event">
     <time class="event__date" datetime="${startTime.format('YYYY-MM-DD')}">${startTime.format('D MMM')}</time>
     <div class="event__type">

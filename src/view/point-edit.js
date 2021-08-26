@@ -1,12 +1,11 @@
 import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
-import { cities, extraOptions } from '../fixtures.js';
+import { cities, extraOptions } from '../mock/point.js';
 
 export default class EditTripPointFormView extends AbstractView {
-  constructor (pointData, pointId) {
+  constructor (pointData) {
     super();
     this._pointData = pointData;
-    this._pointId = pointId;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
@@ -24,7 +23,7 @@ export default class EditTripPointFormView extends AbstractView {
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this._pointData);
   }
 
   setSubmitHandler(callback) {
@@ -51,7 +50,7 @@ export default class EditTripPointFormView extends AbstractView {
     const startTime = dayjs(this._pointData.startTime);
     const endTime = dayjs(this._pointData.endTime);
 
-    return `<form id="${this._pointId}" class="event event--edit" action="#" method="post">
+    return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">

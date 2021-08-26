@@ -32,7 +32,7 @@ export default class Trip {
   }
 
   _renderPoint (point) {
-    const pointPresenter = new PointPresenter(this._pointsListComponent);
+    const pointPresenter = new PointPresenter(this._pointsListComponent, this._handlePointChange);
     pointPresenter.init(point);
     this._pointPresenter.set(point.id, pointPresenter);
   }

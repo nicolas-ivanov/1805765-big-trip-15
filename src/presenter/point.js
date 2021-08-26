@@ -1,10 +1,11 @@
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
-import TripPointView from '../view/trip-point.js';
-import TripPointEditView from '../view/edit-point.js';
+import TripPointView from '../view/point.js';
+import TripPointEditView from '../view/point-edit.js';
 
 export default class Point {
-  constructor (pointsListContainer) {
+  constructor (pointsListContainer, changeData) {
     this._pointsListContainer = pointsListContainer;
+    this._changeData = changeData;
 
     this._pointComponent = null;
     this._pointEditComponent = null;
@@ -13,6 +14,7 @@ export default class Point {
     this._handleFormSubmit = this._handleFormSubmit.bind(this);
     this._handleCollapseClick = this._handleCollapseClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
+    this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
   }
 
   init(point) {
@@ -25,6 +27,7 @@ export default class Point {
     this._pointEditComponent = new TripPointEditView(point);
 
     this._pointComponent.setClickHandler(this._handleEditClick);
+    this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setClickHandler(this._handleCollapseClick);
 
@@ -33,18 +36,28 @@ export default class Point {
       return;
     }
 
-    // Проверка на наличие в DOM необходима,
-    // чтобы не пытаться заменить то, что не было отрисовано
     if (this._pointsListContainer.getElement().contains(prevPointComponent.getElement())) {
       replace(this._pointComponent, prevPointComponent);
     }
 
-    if (this._pointListContainer.getElement().contains(prevPointEditComponent.getElement())) {
+    if (this._pointsListContainer.getElement().contains(prevPointEditComponent.getElement())) {
       replace(this._pointEditComponent, prevPointEditComponent);
     }
 
     remove(prevPointComponent);
     remove(prevPointEditComponent);
+  }
+
+  _handleFavoriteClick() {
+    this._changeData(
+      Object.assign(
+        {},
+        this._point,
+        {
+          isFavorite: !this._point.isFavorite,
+        },
+      ),
+    );
   }
 
   _replaceCardToForm() {
@@ -68,7 +81,8 @@ export default class Point {
     this._replaceCardToForm();
   }
 
-  _handleFormSubmit() {
+  _handleFormSubmit(point) {
+    this._changeData(point);
     this._replaceFormToCard();
   }
 
