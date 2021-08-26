@@ -1,4 +1,4 @@
-import {render, RenderPosition, replace} from '../utils/render.js';
+import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import TripPointView from '../view/trip-point.js';
 import TripPointEditView from '../view/edit-point.js';
 
@@ -18,6 +18,9 @@ export default class Point {
   init(point) {
     this._point = point;
 
+    const prevPointComponent = this._pointComponent;
+    const prevPointEditComponent = this._pointEditComponent;
+
     this._pointComponent = new TripPointView(point);
     this._pointEditComponent = new TripPointEditView(point);
 
@@ -25,7 +28,23 @@ export default class Point {
     this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setClickHandler(this._handleCollapseClick);
 
-    render(this._pointsListContainer, this._pointComponent, RenderPosition.BEFOREEND);
+    if (prevPointComponent === null || prevPointEditComponent === null) {
+      render(this._pointsListContainer, this._pointComponent, RenderPosition.BEFOREEND);
+      return;
+    }
+
+    // Проверка на наличие в DOM необходима,
+    // чтобы не пытаться заменить то, что не было отрисовано
+    if (this._pointsListContainer.getElement().contains(prevPointComponent.getElement())) {
+      replace(this._pointComponent, prevPointComponent);
+    }
+
+    if (this._pointListContainer.getElement().contains(prevPointEditComponent.getElement())) {
+      replace(this._pointEditComponent, prevPointEditComponent);
+    }
+
+    remove(prevPointComponent);
+    remove(prevPointEditComponent);
   }
 
   _replaceCardToForm() {
