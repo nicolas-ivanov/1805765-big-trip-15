@@ -4,7 +4,7 @@ import duration from 'dayjs/plugin/duration';
 
 dayjs.extend(duration);
 
-export default class TripPoint extends AbstractView {
+export default class TripPointView extends AbstractView {
   constructor (pointData, pointId) {
     super();
     this._pointData = pointData;

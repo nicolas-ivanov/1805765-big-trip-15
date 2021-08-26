@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 
-export default class SiteMenu extends AbstractView{
+export default class SiteMenuView extends AbstractView{
   getTemplate () {
     return `<div class="trip-controls__navigation">
       <h2 class="visually-hidden">Switch trip view</h2>

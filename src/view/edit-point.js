@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
 import { cities, extraOptions } from '../fixtures.js';
 
-export default class EditTripPointForm extends AbstractView {
+export default class EditTripPointFormView extends AbstractView {
   constructor (pointData, pointId) {
     super();
     this._pointData = pointData;

@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 
-export default class NoPoints extends AbstractView {
+export default class TripPointView extends AbstractView {
   getTemplate () {
     return `<section class="trip-events">
       <h2 class="visually-hidden">Trip events</h2>
