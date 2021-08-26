@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
+
 
 const POINTS_COUNT = 10;
 
@@ -176,6 +178,7 @@ export const generatePoint = () => {
   const [start, end] = generateDatePair();
 
   return {
+    id: nanoid(),
     basePrice: 50 * getRandomInteger(1, 100),
     startTime: start,
     endTime: end,

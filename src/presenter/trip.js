@@ -1,5 +1,5 @@
 import PointPresenter from './point.js';
-import { render, RenderPosition } from '../utils/render.js';
+import { render, RenderPosition} from '../utils/render.js';
 import SortingView from '../view/sorting.js';
 import TripPointsListView from '../view/trip-points-list.js';
 import NoPointsView from '../view/no-points.js';
@@ -7,6 +7,7 @@ import NoPointsView from '../view/no-points.js';
 export default class Trip {
   constructor (tripListContainer) {
     this._tripListContainer = tripListContainer;
+    this._pointPresenter = new Map();
 
     this._noPointsComponent = new NoPointsView();
     this._sortingComponent = new SortingView();
@@ -30,6 +31,7 @@ export default class Trip {
   _renderPoint (point) {
     const pointPresenter = new PointPresenter(this._pointsListComponent);
     pointPresenter.init(point);
+    this._pointPresenter.set(point.id, pointPresenter);
   }
 
   _renderPoints() {
@@ -44,5 +46,10 @@ export default class Trip {
       // const siteEventsListElement = this._tripListContainer.querySelector('.trip-events__list');
       this._renderPoints();
     }
+  }
+
+  _clearTripList() {
+    this._pointPresenter.forEach((presenter) => presenter.destroy());
+    this._pointPresenter.clear();
   }
 }

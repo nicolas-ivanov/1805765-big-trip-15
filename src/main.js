@@ -3,7 +3,7 @@ import SiteMenuView from './view/site-menu.js';
 import FiltersView from './view/filters.js';
 import TripInfoView from './view/trip-info.js';
 import TripListPresenter from './presenter/trip.js';
-import { generatedPoints } from './fixtures.js';
+import { generatedPoints } from './mock/point.js';
 
 const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
