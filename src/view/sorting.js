@@ -1,6 +1,28 @@
 import AbstractView from './abstract.js';
 
 export default class SortingView extends AbstractView{
+  constructor() {
+    super();
+
+    this._sortTypeChangeHandler = this._sortTypeChangeHandler.bind(this);
+  }
+
+  _sortTypeChangeHandler(evt) {
+    if (evt.target.tagName !== 'label') {
+      return;
+    }
+
+    evt.preventDefault();
+    const inputId = evt.target.getAttribute('for');
+    const sortType = evt.target.parentElement.getElementById(inputId).getAttribute('value');
+    this._callback.sortTypeChange(sortType);
+  }
+
+  setSortTypeChangeHandler(callback) {
+    this._callback.sortTypeChange = callback;
+    this.getEleement().addEventListener('click', this._sortTypeChangeHandler);
+  }
+
   getTemplate () {
     return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
     <div class="trip-sort__item  trip-sort__item--day">
