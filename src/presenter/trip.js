@@ -1,8 +1,9 @@
 import PointPresenter from './point.js';
-import { render, RenderPosition} from '../utils/render.js';
 import SortingView from '../view/sorting.js';
 import TripPointsListView from '../view/trip-points-list.js';
 import NoPointsView from '../view/no-points.js';
+import { render, RenderPosition} from '../utils/render.js';
+import { updateItem } from '../utils/common.js';
 
 export default class Trip {
   constructor (tripListContainer) {
@@ -12,6 +13,8 @@ export default class Trip {
     this._noPointsComponent = new NoPointsView();
     this._sortingComponent = new SortingView();
     this._pointsListComponent = new TripPointsListView();
+
+    this._handlePointChange = this._handlePointChange.bind(this);
   }
 
   init(points) {
@@ -51,5 +54,10 @@ export default class Trip {
   _clearTripList() {
     this._pointPresenter.forEach((presenter) => presenter.destroy());
     this._pointPresenter.clear();
+  }
+
+  _handlePointChange(updatedPoint) {
+    this._points = updateItem(this._points, updatedPoint);
+    this._pointPresenter.get(updatedPoint.id).init(updatedPoint);
   }
 }
