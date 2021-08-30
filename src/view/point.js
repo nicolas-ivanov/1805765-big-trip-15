@@ -12,6 +12,18 @@ export default class TripPointView extends AbstractView {
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
   }
 
+  get startTime() {
+    return this._pointData.startTime;
+  }
+
+  get basePrice() {
+    return this._pointData.basePrice;
+  }
+
+  get destination() {
+    return this._pointData.destination;
+  }
+
   _clickHandler(evt) {
     evt.preventDefault();
     this._callback.click();

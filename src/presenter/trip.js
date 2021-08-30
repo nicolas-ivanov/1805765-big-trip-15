@@ -4,11 +4,15 @@ import TripPointsListView from '../view/trip-points-list.js';
 import NoPointsView from '../view/no-points.js';
 import { render, RenderPosition} from '../utils/render.js';
 import { updateItem } from '../utils/common.js';
+import { SortType } from '../const.js';
+import { sortByDays, sortByPrice, sortByTime, sortByEvents } from '../utils/point.js';
+
 
 export default class Trip {
   constructor (tripListContainer) {
     this._tripListContainer = tripListContainer;
     this._pointPresenter = new Map();
+    this._currentSortType = SortType.DEFAULT;
 
     this._noPointsComponent = new NoPointsView();
     this._sortingComponent = new SortingView();
@@ -21,14 +25,19 @@ export default class Trip {
 
   init(points) {
     this._points = points.slice();
+    this._sourcedPoints = points.slice();
     render(this._tripListContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTripList();
   }
 
   _handleSortTypeChange(sortType) {
-    // - Сортируем задачи
-    // - Очищаем список
-    // - Рендерим список заново
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortPoints(sortType);
+    this._clearTripList();
+    this._renderTripList();
   }
 
   _renderNoPoints() {
@@ -67,10 +76,36 @@ export default class Trip {
 
   _handlePointChange(updatedPoint) {
     this._points = updateItem(this._points, updatedPoint);
+    this._sourcedPoints = updateItem(this._sourcedPoints, updatedPoint);
     this._pointPresenter.get(updatedPoint.id).init(updatedPoint);
   }
 
   _handleModeChange() {
     this._pointPresenter.forEach((presenter) => presenter.resetView());
+  }
+
+  _sortPoints(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    switch (sortType) {
+      case SortType.DAY:
+        this._points.sort(sortByDays);
+        break;
+      case SortType.EVENT:
+        this._points.sort(sortByEvents);
+        break;
+      case SortType.TIME:
+        this._points.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this._points.sort(sortByPrice);
+        break;
+      default:
+        this._points = this._sourcedBoardTasks.slice();
+    }
+
+    this._currentSortType = sortType;
   }
 }
