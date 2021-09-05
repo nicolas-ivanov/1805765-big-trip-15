@@ -1,6 +1,6 @@
-import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
 import { cities, extraOptions } from '../fixtures.js';
+import { formatDate } from '../utils/date.js';
 
 export default class NewPointForm extends AbstractView {
   constructor (pointData) {
@@ -35,8 +35,8 @@ export default class NewPointForm extends AbstractView {
   }
 
   getTemplate () {
-    const startTime = this._pointData.startTime ? dayjs(this._pointData.startTime).format('DD/MM/YY HH:mm') : '';
-    const endTime = this._pointData.endTime ? dayjs(this._pointData.endTime).format('DD/MM/YY HH:mm') : '';
+    const startTime = this._pointData.startTime ? formatDate(this._pointData.startTime, 'DD/MM/YY HH:mm') : '';
+    const endTime = this._pointData.endTime ? formatDate(this._pointData.endTime, 'DD/MM/YY HH:mm') : '';
 
     return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">

@@ -1,6 +1,6 @@
-import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
 import { add } from '../utils/common.js';
+import { formatDate } from '../utils/date.js';
 
 export default class TripInfoView extends AbstractView {
   constructor (tripPoints) {
@@ -16,8 +16,8 @@ export default class TripInfoView extends AbstractView {
     let [startTime, endTime] = [null, null];
 
     if (this._tripPoints.length > 0) {
-      startTime = dayjs(this._tripPoints[0].startTime).format('D MMM');
-      endTime = dayjs(this._tripPoints[this._tripPoints.length - 1].endTime).format('D MMM');
+      startTime = formatDate(this._tripPoints[0].startTime, 'D MMM');
+      endTime = formatDate(this._tripPoints[this._tripPoints.length - 1].endTime, 'D MMM');
     }
 
     return `<section class="trip-main__trip-info  trip-info">

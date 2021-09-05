@@ -1,6 +1,6 @@
-import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
 import { cities, extraOptions } from '../mock/point.js';
+import { formatDate } from '../utils/date.js';
 
 export default class EditTripPointFormView extends AbstractView {
   constructor (pointData) {
@@ -47,8 +47,8 @@ export default class EditTripPointFormView extends AbstractView {
   }
 
   getTemplate () {
-    const startTime = dayjs(this._pointData.startTime);
-    const endTime = dayjs(this._pointData.endTime);
+    const start = this._pointData.startTime;
+    const end = this._pointData.endTime;
 
     return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -128,10 +128,10 @@ export default class EditTripPointFormView extends AbstractView {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startTime.format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(start, 'DD/MM/YY HH:mm')}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endTime.format('DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(end, 'DD/MM/YY HH:mm')}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
