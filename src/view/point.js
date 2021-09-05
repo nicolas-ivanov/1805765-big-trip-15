@@ -1,8 +1,5 @@
-import dayjs from 'dayjs';
 import AbstractView from './abstract.js';
-import duration from 'dayjs/plugin/duration';
-
-dayjs.extend(duration);
+import { getTimeDiffDisplay, formatDate } from '../utils/date.js';
 
 export default class TripPointView extends AbstractView {
   constructor (pointData) {
@@ -44,18 +41,6 @@ export default class TripPointView extends AbstractView {
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
   }
 
-  _getTimeDiffDisplay (startTime, endTime) {
-    const durationObj = dayjs.duration(endTime.diff(startTime));
-
-    if (durationObj.hours() < 1) {
-      return durationObj.format('mm[M]');
-    } else if (durationObj.hours() < 24) {
-      return durationObj.format('HH[H] mm[M]');
-    } else {
-      return durationObj.format('dd[D] HH[H] mm[M]');
-    }
-  }
-
   _getOffersDisplay (offers) {
     return offers.map((offer) => `<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>
@@ -65,23 +50,23 @@ export default class TripPointView extends AbstractView {
   }
 
   getTemplate () {
-    const startTime = dayjs(this._pointData.startTime);
-    const endTime = dayjs(this._pointData.endTime);
+    const start = this._pointData.startTime;
+    const end = this._pointData.endTime;
 
     return `<li class="trip-events__item">
     <div class="event">
-    <time class="event__date" datetime="${startTime.format('YYYY-MM-DD')}">${startTime.format('D MMM')}</time>
+    <time class="event__date" datetime="${formatDate(start, 'YYYY-MM-DD')}">${formatDate(start, 'D MMM')}</time>
     <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${this._pointData.pointType}.png" alt="Event type icon">
     </div>
     <h3 class="event__title">${this._pointData.pointType} ${this._pointData.destination}</h3>
     <div class="event__schedule">
         <p class="event__time">
-        <time class="event__start-time" datetime="2019-03-18Thh:mm">${startTime.format('HH:mm')}</time>
+        <time class="event__start-time" datetime="2019-03-18Thh:mm">${formatDate(start, 'HH:mm')}</time>
         &mdash;
-        <time class="event__end-time" datetime="${endTime.format('YYYY-MM-DDThh:mm')}">${endTime.format('HH:mm')}</time>
+        <time class="event__end-time" datetime="${formatDate(end, 'YYYY-MM-DDThh:mm')}">${formatDate(start, 'HH:mm')}</time>
         </p>
-        <p class="event__duration">${this._getTimeDiffDisplay(startTime, endTime)}</p>
+        <p class="event__duration">${getTimeDiffDisplay(start, end)}</p>
     </div>
     <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${this._pointData.basePrice}</span>

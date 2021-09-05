@@ -1,23 +1,8 @@
-import dayjs from 'dayjs';
-import {nanoid} from 'nanoid';
+import { nanoid } from 'nanoid';
+import { getRandomInteger, generateDatePair, getRandomArrayElements } from '../utils/common.js';
 
 
 const POINTS_COUNT = 10;
-
-const getRandomInteger = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-const generateDatePair = () => {
-  const start = dayjs().add(getRandomInteger(0, 100), 'hour').minute(0);
-  const minutesValues = [30, 60, 90, 1440, 1470, 1500, 1560];
-  const end = start.add(minutesValues[getRandomInteger(0, minutesValues.length - 1)], 'minutes');
-
-  return [start.toDate(), end.toDate()];
-};
 
 const pointType = [
   'taxi',
@@ -159,19 +144,6 @@ const loremList = lorem.split('. ');
 
 const getPhoto = () => `http://picsum.photos/248/152?r=${  Math.random()}`;
 
-function getRandomArrayElements (arr, n) {
-  const result = new Array(n);
-  let len = arr.length;
-  const taken = new Array(len);
-  if (n > len) { throw new RangeError('getRandom: more elements taken than available'); }
-  while (n--) {
-    const x = Math.floor(Math.random() * len);
-    result[n] = arr[x in taken ? taken[x] : x];
-    taken[x] = --len in taken ? taken[len] : len;
-  }
-  return result;
-}
-
 export const generatePoint = () => {
   const selectedPointType = pointType[getRandomInteger(0, pointType.length - 1)];
   const selectedPointTypeOptions = extraOptions[selectedPointType];
@@ -191,7 +163,7 @@ export const generatePoint = () => {
   };
 };
 
-export const generatedPoints = new Array(POINTS_COUNT).fill().map(() => generatePoint());
+export const generatedPoints = Array.from(Array(POINTS_COUNT), generatePoint);
 
 export const emptyPoint = {
   pointType: 'taxi',
