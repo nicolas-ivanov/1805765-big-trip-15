@@ -30,16 +30,6 @@ export default class Trip {
     this._renderTripList();
   }
 
-  _handleSortTypeChange(sortType) {
-    if (this._currentSortType === sortType) {
-      return;
-    }
-
-    this._sortPoints(sortType);
-    this._clearTripList();
-    this._renderTripList();
-  }
-
   _renderNoPoints() {
     render(this._tripListContainer, this._noPointsComponent, RenderPosition.AFTERBEGIN);
   }
@@ -64,7 +54,6 @@ export default class Trip {
       this._renderNoPoints();
     } else {
       this._renderSort();
-      // const siteEventsListElement = this._tripListContainer.querySelector('.trip-events__list');
       this._renderPoints();
     }
   }
@@ -82,6 +71,16 @@ export default class Trip {
 
   _handleModeChange() {
     this._pointPresenter.forEach((presenter) => presenter.resetView());
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortPoints(sortType);
+    this._clearTripList();
+    this._renderTripList();
   }
 
   _sortPoints(sortType) {
@@ -103,7 +102,7 @@ export default class Trip {
         this._points.sort(sortByPrice);
         break;
       default:
-        this._points = this._sourcedBoardTasks.slice();
+        this._points = this._sourcedPoints.slice();
     }
 
     this._currentSortType = sortType;

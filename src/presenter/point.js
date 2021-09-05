@@ -39,16 +39,16 @@ export default class Point {
     this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setClickHandler(this._handleCollapseClick);
 
-    if (this._mode === Mode.DEFAULT) {
+    if (prevPointComponent === null) {
       render(this._pointsListContainer, this._pointComponent, RenderPosition.BEFOREEND);
       return;
     }
 
-    if (this._mode === Mode.EDITING) {
+    if (this._mode === Mode.DEFAULT) {
       replace(this._pointComponent, prevPointComponent);
     }
 
-    if (this._pointsListContainer.getElement().contains(prevPointEditComponent.getElement())) {
+    if (this._mode === Mode.EDITING) {
       replace(this._pointEditComponent, prevPointEditComponent);
     }
 
