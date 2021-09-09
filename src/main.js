@@ -11,8 +11,8 @@ const tripListContainer = document.querySelector('.trip-events');
 
 const tripPresenter = new TripListPresenter(tripListContainer);
 
-render(siteTripControlsElement, new SiteMenuView().getElement(), RenderPosition.AFTERBEGIN);
-render(siteTripControlsElement, new FiltersView().getElement(), RenderPosition.BEFOREEND);
-render(siteHeaderElement, new TripInfoView(generatedPoints).getElement(), RenderPosition.AFTERBEGIN);
+render(siteTripControlsElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
+render(siteTripControlsElement, new FiltersView(), RenderPosition.BEFOREEND);
+render(siteHeaderElement, new TripInfoView(generatedPoints), RenderPosition.AFTERBEGIN);
 
 tripPresenter.init(generatedPoints);

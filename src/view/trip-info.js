@@ -1,5 +1,4 @@
 import AbstractView from './abstract.js';
-import { add } from '../utils/common.js';
 import { formatDate } from '../utils/date.js';
 
 export default class TripInfoView extends AbstractView {
@@ -9,11 +8,12 @@ export default class TripInfoView extends AbstractView {
   }
 
   _getOffersSumPrice (offers) {
-    return offers.map((offer) => offer.price).reduce(add, 0);
+    return offers.map((offer) => offer.price).reduce((accumulator, a) => accumulator + a, 0);
   }
 
   getTemplate () {
-    let [startTime, endTime] = [null, null];
+    let startTime = null;
+    let endTime = null;
 
     if (this._tripPoints.length > 0) {
       startTime = formatDate(this._tripPoints[0].startTime, 'D MMM');
@@ -31,7 +31,7 @@ export default class TripInfoView extends AbstractView {
     </div>
       <p class="trip-info__cost">
       Total: &euro;&nbsp;<span class="trip-info__cost-value">
-      ${this._tripPoints.map((point) => point.basePrice + this._getOffersSumPrice(point.offers)).reduce(add, 0)}
+      ${this._tripPoints.map((point) => point.basePrice + this._getOffersSumPrice(point.offers)).reduce((accumulator, a) => accumulator + a, 0)}
       </span>
     </p>
   </section>`;

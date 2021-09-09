@@ -1,6 +1,6 @@
-
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import { getRandomInteger } from './common.js';
 
 dayjs.extend(duration);
 
@@ -20,3 +20,11 @@ export const getTimeDiffDisplay = (startTime, endTime) => {
 };
 
 export const formatDate = (date, formatString) => dayjs(date).format(formatString);
+
+export const generateDatePair = () => {
+  const start = dayjs().add(getRandomInteger(0, 100), 'hour').minute(0);
+  const minutesValues = [30, 60, 90, 1440, 1470, 1500, 1560];
+  const end = start.add(minutesValues[getRandomInteger(0, minutesValues.length - 1)], 'minutes');
+
+  return [start.toDate(), end.toDate()];
+};

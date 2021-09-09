@@ -3,9 +3,23 @@ import SortingView from '../view/sorting.js';
 import TripPointsListView from '../view/trip-points-list.js';
 import NoPointsView from '../view/no-points.js';
 import { render, RenderPosition} from '../utils/render.js';
-import { updateItem } from '../utils/common.js';
 import { SortType } from '../const.js';
 import { sortByDays, sortByPrice, sortByTime, sortByEvents } from '../utils/point.js';
+
+
+const _updateItem = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1),
+  ];
+};
 
 
 export default class Trip {
@@ -64,8 +78,8 @@ export default class Trip {
   }
 
   _handlePointChange(updatedPoint) {
-    this._points = updateItem(this._points, updatedPoint);
-    this._sourcedPoints = updateItem(this._sourcedPoints, updatedPoint);
+    this._points = _updateItem(this._points, updatedPoint);
+    this._sourcedPoints = _updateItem(this._sourcedPoints, updatedPoint);
     this._pointPresenter.get(updatedPoint.id).init(updatedPoint);
   }
 

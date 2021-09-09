@@ -1,5 +1,6 @@
 import { nanoid } from 'nanoid';
-import { getRandomInteger, generateDatePair, getRandomArrayElements } from '../utils/common.js';
+import { getRandomInteger, getRandomArrayElements } from '../utils/common.js';
+import { generateDatePair } from '../utils/date.js';
 
 
 const POINTS_COUNT = 10;
