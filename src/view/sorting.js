@@ -23,6 +23,11 @@ export default class SortingView extends AbstractView {
     this.getElement().addEventListener('click', this._sortTypeChangeHandler);
   }
 
+  removeElement () {
+    this.getElement().removeEventListener('click', this._sortTypeChangeHandler);
+    super.removeElement();
+  }
+
   getTemplate () {
     return `<form class="trip-events__trip-sort  trip-sort" action="#" method="get">
       <div class="trip-sort__item  trip-sort__item--day">

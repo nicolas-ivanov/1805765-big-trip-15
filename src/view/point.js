@@ -41,6 +41,12 @@ export default class TripPointView extends AbstractView {
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._favoriteClickHandler);
   }
 
+  removeElement () {
+    this.getElement().querySelector('.event__rollup-btn').removeEventListener('click', this._clickHandler);
+    this.getElement().querySelector('.event__favorite-btn').removeEventListener('click', this._favoriteClickHandler);
+    super.removeElement();
+  }
+
   _getOffersDisplay (offers) {
     return offers.map((offer) => `<li class="event__offer">
         <span class="event__offer-title">${offer.title}</span>

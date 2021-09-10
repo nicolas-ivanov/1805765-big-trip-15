@@ -28,3 +28,7 @@ export const generateDatePair = () => {
 
   return [start.toDate(), end.toDate()];
 };
+
+export const getDatesDiff = (dateA, dateB) => dayjs(dateA).diff(dayjs(dateB));
+
+export const getDateHour = (date) => dayjs(date).hour();

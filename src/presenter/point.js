@@ -59,6 +59,7 @@ export default class Point {
   destroy() {
     remove(this._pointComponent);
     remove(this._pointEditComponent);
+    this._pointsListContainer = null;
   }
 
   resetView() {

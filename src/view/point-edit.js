@@ -31,6 +31,12 @@ export default class EditTripPointFormView extends AbstractView {
     this.getElement().addEventListener('submit', this._submitHandler);
   }
 
+  removeElement () {
+    this.getElement().querySelector('.event__rollup-btn').removeEventListener('click', this._clickHandler);
+    this.getElement().removeEventListener('submit', this._submitHandler);
+    super.removeElement();
+  }
+
 
   _getOffersDisplay (defaultOffers, selectedOffers) {
     const selectedOffersIDs = selectedOffers.map((offer) => offer.id);
