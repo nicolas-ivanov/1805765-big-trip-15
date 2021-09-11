@@ -23,7 +23,8 @@ const _updateItem = (items, update) => {
 
 
 export default class Trip {
-  constructor (tripListContainer) {
+  constructor (tripListContainer, pointsModel) {
+    this._pointsModel = pointsModel;
     this._tripListContainer = tripListContainer;
     this._pointPresenter = new Map();
     this._currentSortType = SortType.DEFAULT;
@@ -42,6 +43,10 @@ export default class Trip {
     this._sourcedPoints = points.slice();
     render(this._tripListContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTripList();
+  }
+
+  _getPoints() {
+    return this._pointsModel.getPoints();
   }
 
   _renderNoPoints() {
