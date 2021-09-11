@@ -2,7 +2,7 @@ import PointPresenter from './point.js';
 import SortingView from '../view/sorting.js';
 import TripPointsListView from '../view/trip-points-list.js';
 import NoPointsView from '../view/no-points.js';
-import { render, RenderPosition} from '../utils/render.js';
+import { render, RenderPosition, remove} from '../utils/render.js';
 import { SortType, UpdateType, UserAction } from '../const.js';
 import { sortByDays, sortByPrice, sortByTime, sortByEvents } from '../utils/point.js';
 
@@ -13,8 +13,9 @@ export default class Trip {
     this._pointPresenter = new Map();
     this._currentSortType = SortType.DEFAULT;
 
+    this._sortComponent = null;
+
     this._noPointsComponent = new NoPointsView();
-    this._sortingComponent = new SortingView();
     this._pointsListComponent = new TripPointsListView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
@@ -51,8 +52,13 @@ export default class Trip {
   }
 
   _renderSort() {
-    render(this._tripListContainer, this._sortingComponent, RenderPosition.AFTERBEGIN);
-    this._sortingComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    if (this._sortComponent !== null) {
+      this._sortComponent = null;
+    }
+
+    this._sortComponent = new SortingView(this._currentSortType);
+    this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
+    render(this._tripListContainer, this._sortComponent, RenderPosition.AFTERBEGIN);
   }
 
   _renderPoint(point) {
@@ -77,9 +83,16 @@ export default class Trip {
     }
   }
 
-  _clearTripList() {
+  _clearTripList({resetSortType = false} = {}) {
     this._pointPresenter.forEach((presenter) => presenter.destroy());
     this._pointPresenter.clear();
+
+    remove(this._sortComponent);
+    remove(this._noPointsComponent);
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DEFAULT;
+    }
   }
 
   _handlePointChange(updatedPoint) {
@@ -112,10 +125,12 @@ export default class Trip {
         this._pointPresenter.get(data.id).init(data);
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда точка ушла в архив)
+        this._clearTripList();
+        this._renderTripList();
         break;
       case UpdateType.MAJOR:
-        // - обновить весь список точек (например, при переключении фильтра)
+        this._clearTripList({resetSortType: true});
+        this._renderTripList();
         break;
     }
   }
