@@ -17,3 +17,17 @@ export const getRandomArrayElements = (arr, arrLength) => {
   }
   return result;
 };
+
+export const toggleValueInArray = (arr, value) => {
+  const index = arr.indexOf(value);
+
+  if (index === -1) {
+    arr.push(value);
+  } else {
+    arr.splice(index, 1);
+  }
+
+  return arr;
+};
+
+export const isNotEmptyInput = (input) => !!input.value.trim().length;

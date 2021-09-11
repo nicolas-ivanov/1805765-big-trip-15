@@ -1,29 +1,132 @@
-import AbstractView from './abstract.js';
-import { cities, extraOptions } from '../mock/point.js';
+import SmartView from './smart.js';
+import { CITIES, extraOptions, BLANK_POINT } from '../mock/point.js';
 import { formatDate } from '../utils/date.js';
+import { toggleValueInArray, isNotEmptyInput } from '../utils/common.js';
+import { createElement } from '../utils/render.js';
+import flatpickr from 'flatpickr';
 
-export default class EditTripPointFormView extends AbstractView {
-  constructor (pointData) {
+import '../../node_modules/flatpickr/dist/flatpickr.min.css';
+
+
+const DATES_LABELS = {
+  startTime: '#event-start-time-1',
+  endTime: '#event-end-time-1',
+};
+
+
+export default class EditTripPointFormView extends SmartView {
+  constructor (pointData = BLANK_POINT) {
     super();
-    this._pointData = pointData;
+    this._data = pointData;
+    this._data.offersCandidates = this._data.offers.slice();
+    this._datepicker = null;
 
-    this._clickHandler = this._clickHandler.bind(this);
+    this._rollUpClickHandler = this._rollUpClickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
+    this._chooseEventTypeClickHandler = this._chooseEventTypeClickHandler.bind(this);
+    this._chooseOffersClickHandler = this._chooseOffersClickHandler.bind(this);
+    // this._startTimeChangeHandler = this._dateChangeHandler.bind(this);
+
+    this._setInnerHandlers();
+    this._setDatepicker();
+    this._isSubmitEnabled = this._updateSubmitButtonEnabled();
   }
 
-  _clickHandler(evt) {
+  _setDatepicker() {
+    if (this._datepicker) {
+      this._datepicker.destroy();
+      this._datepicker = null;
+    }
+
+    Object.entries(DATES_LABELS).forEach(([dateLabel, dateID]) => {
+      if (this._data[dateLabel]) {
+        // flatpickr есть смысл инициализировать только в случае,
+        // если поле выбора даты доступно для заполнения
+        this._datepicker = flatpickr(
+          this.getElement().querySelector(dateID),
+          {
+            enableTime: true,
+            dateFormat: 'y/m/d H:i',
+            defaultDate: this._data[dateLabel],
+            onChange: ([userDate]) => {
+              this.updateData({
+                [dateLabel]: userDate,
+              });
+            },
+          },
+        );
+      }
+    });
+  }
+
+  _rollUpClickHandler(evt) {
     evt.preventDefault();
-    this._callback.click();
+    this._callback.rollUpClick();
   }
 
-  setClickHandler(callback) {
-    this._callback.click = callback;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._clickHandler);
+  setRollUpClickHandler(callback) {
+    this._callback.rollUpClick = callback;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollUpClickHandler);
+  }
+
+  _chooseEventTypeClickHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.tagName !== 'LABEL') {
+      return;
+    }
+
+    const inputId = evt.target.getAttribute('for');
+    const pType = document.getElementById(inputId).getAttribute('value');
+
+    this.updateData({
+      pointType: pType,
+    });
+  }
+
+  _chooseOffersClickHandler(evt) {
+    const goodLabels = ['LABEL', 'SPAN'];
+
+    if (!(goodLabels.includes(evt.target.tagName))) {
+      return;
+    }
+
+    const inputElement = evt.target.tagName === 'SPAN' ? evt.target.parentNode : evt.target;
+    const offerid = inputElement.dataset.offerid;
+
+    this.updateData({
+      offersCandidates: toggleValueInArray(this._data.offersCandidates, offerid),
+    });
+  }
+
+  _updateSubmitButtonEnabled() {
+    const destination = this.getElement().querySelector('.event__input--destination');
+    const startTime = this.getElement().querySelector('#event-start-time-1');
+    const endTime = this.getElement().querySelector('#event-end-time-1');
+    const price = this.getElement().querySelector('.event__input--price');
+
+    const inputs = [destination, startTime, endTime, price];
+    this._isSubmitEnabled = inputs.every(isNotEmptyInput);
+
+    const prevSubmitBtn = this.getElement().querySelector('.event__save-btn');
+    const parent = prevSubmitBtn.parentElement;
+
+    const newSubmitBtn = createElement(`<button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>`);
+    parent.replaceChild(newSubmitBtn, prevSubmitBtn);
+  }
+
+  _getInputHandler(field) {
+    return (evt) => {
+      evt.preventDefault();
+      this._updateSubmitButtonEnabled();
+      this.updateData({
+        [field]: evt.target.value,
+      }, true);
+    };
   }
 
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.formSubmit(this._pointData);
+    this._callback.formSubmit(this._data);
   }
 
   setSubmitHandler(callback) {
@@ -37,14 +140,50 @@ export default class EditTripPointFormView extends AbstractView {
     super.removeElement();
   }
 
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSubmitHandler(this._callback.formSubmit);
+    this.setRollUpClickHandler(this._callback.rollUpClick);
+    this._setDatepicker();
+  }
 
-  _getOffersDisplay (defaultOffers, selectedOffers) {
-    const selectedOffersIDs = selectedOffers.map((offer) => offer.id);
+  _setInnerHandlers() {
+    Array.from(this.getElement().getElementsByClassName('event__type-item')).forEach((element) => {
+      element.addEventListener('click', this._chooseEventTypeClickHandler);
+    });
 
+    Array.from(this.getElement().getElementsByClassName('event__offer-label')).forEach((element) => {
+      element.addEventListener('click', this._chooseOffersClickHandler);
+    });
+
+    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._getInputHandler('destination'));
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._getInputHandler('basePrice'));
+    this.getElement().querySelector('#event-start-time-1').addEventListener('input', this._getInputHandler('startTime'));
+    this.getElement().querySelector('#event-end-time-1').addEventListener('input', this._getInputHandler('endTime'));
+  }
+
+
+  static parsePointToData(point) {
+    const pointData = Object.assign({}, point);
+    pointData.offersCandidates = pointData.offers.slice();
+    return pointData;
+  }
+
+  static parseDataToPoint(data) {
+    return Object.assign({}, data);
+  }
+
+  reset(pointOriginal) {
+    this.updateData(
+      EditTripPointFormView.parsePointToData(pointOriginal),
+    );
+  }
+
+  _getOffersDisplay (defaultOffers, selectedOffersIDs) {
     return defaultOffers.map((offer) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" 
         type="checkbox" name="event-offer-${offer.id}" ${selectedOffersIDs.includes(offer.id) ? 'checked' : ''}>
-        <label class="event__offer-label" for="event-offer-${offer.id}">
+        <label class="event__offer-label" for="event-offer-${offer.id}" data-offerid="${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
           <span class="event__offer-price">${offer.price}</span>
@@ -53,15 +192,15 @@ export default class EditTripPointFormView extends AbstractView {
   }
 
   getTemplate () {
-    const start = this._pointData.startTime;
-    const end = this._pointData.endTime;
+    const start = this._data.startTime;
+    const end = this._data.endTime;
 
     return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${this._pointData.pointType}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${this._data.pointType}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -87,11 +226,6 @@ export default class EditTripPointFormView extends AbstractView {
             <div class="event__type-item">
               <input id="event-type-ship-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="ship">
               <label class="event__type-label  event__type-label--ship" for="event-type-ship-1">Ship</label>
-            </div>
-
-            <div class="event__type-item">
-              <input id="event-type-transport-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="transport">
-              <label class="event__type-label  event__type-label--transport" for="event-type-transport-1">Transport</label>
             </div>
 
             <div class="event__type-item">
@@ -124,11 +258,11 @@ export default class EditTripPointFormView extends AbstractView {
 
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${this._pointData.pointType}
+          ${this._data.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._pointData.destination}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination}" list="destination-list-1">
         <datalist id="destination-list-1">
-          ${cities.map((city) => (`<option value="${  city  }"></option>`)).join('')}
+          ${CITIES.map((city) => (`<option value="${  city  }"></option>`)).join('')}
         </datalist>
       </div>
 
@@ -145,10 +279,10 @@ export default class EditTripPointFormView extends AbstractView {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._pointData.basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._data.basePrice}">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
@@ -159,13 +293,13 @@ export default class EditTripPointFormView extends AbstractView {
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          ${this._getOffersDisplay(extraOptions[this._pointData.pointType], this._pointData.offers)}
+          ${this._getOffersDisplay(extraOptions[this._data.pointType], this._data.offersCandidates)}
         </div>
       </section>
 
       <section class="event__section  event__section--destination">
         <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${this._pointData.description}</p>
+        <p class="event__destination-description">${this._data.description}</p>
       </section>
     </section>
   </form>`;

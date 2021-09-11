@@ -1,11 +1,10 @@
 import { nanoid } from 'nanoid';
 import { getRandomInteger, getRandomArrayElements } from '../utils/common.js';
-import { generateDatePair } from '../utils/date.js';
-
+import { generateDatePair, getCurrentDateStr } from '../utils/date.js';
 
 const POINTS_COUNT = 10;
 
-const pointType = [
+const POINT_TYPE = [
   'taxi',
   'bus',
   'train',
@@ -131,7 +130,7 @@ export const extraOptions = {
   ],
 };
 
-export const cities = [
+export const CITIES = [
   'Moscow',
   'San Francisco',
   'Amsterdam',
@@ -145,9 +144,12 @@ const loremList = lorem.split('. ');
 
 const getPhoto = () => `http://picsum.photos/248/152?r=${  Math.random()}`;
 
+const getSelecteOptionsIDs = (pointType) => extraOptions[pointType].map((optionData) => optionData.id);
+
 export const generatePoint = () => {
-  const selectedPointType = pointType[getRandomInteger(0, pointType.length - 1)];
-  const selectedPointTypeOptions = extraOptions[selectedPointType];
+  const selectedPointType = POINT_TYPE[getRandomInteger(0, POINT_TYPE.length - 1)];
+  const selectedOptions = getSelecteOptionsIDs(selectedPointType);
+
   const [start, end] = generateDatePair();
 
   return {
@@ -156,8 +158,8 @@ export const generatePoint = () => {
     startTime: start,
     endTime: end,
     pointType: selectedPointType,
-    destination: cities[getRandomInteger(0, cities.length - 1)],
-    offers: getRandomArrayElements(selectedPointTypeOptions, getRandomInteger(0, selectedPointTypeOptions.length - 1)),
+    destination: CITIES[getRandomInteger(0, CITIES.length - 1)],
+    offers: getRandomArrayElements(selectedOptions, getRandomInteger(0, selectedOptions.length - 1)),
     description: loremList.slice(0, getRandomInteger(1, 5)),
     photos: new Array(getRandomInteger(3, 5)).fill().map(() => getPhoto()),
     isFavorite: !getRandomInteger(0, 1),
@@ -166,13 +168,16 @@ export const generatePoint = () => {
 
 export const generatedPoints = Array.from(Array(POINTS_COUNT), generatePoint);
 
-export const emptyPoint = {
-  pointType: 'taxi',
+const DEFAULT_POINT_TYPE = 'taxi';
+const CURRENT_DATE = getCurrentDateStr();
+
+export const BLANK_POINT = {
+  pointType: DEFAULT_POINT_TYPE,
   basePrice: null,
-  startTime: null,
-  endTime: null,
+  startTime: CURRENT_DATE,
+  endTime:  CURRENT_DATE,
   destination: null,
-  offers: null,
+  offers: getSelecteOptionsIDs(DEFAULT_POINT_TYPE),
   description: null,
   photos: null,
   isFavorite: null,

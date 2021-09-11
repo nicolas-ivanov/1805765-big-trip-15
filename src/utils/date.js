@@ -32,3 +32,5 @@ export const generateDatePair = () => {
 export const getDatesDiff = (dateA, dateB) => dayjs(dateA).diff(dayjs(dateB));
 
 export const getDateHour = (date) => dayjs(date).hour();
+
+export const getCurrentDateStr = () => formatDate(dayjs(), 'DD/MM/YY HH:00');
