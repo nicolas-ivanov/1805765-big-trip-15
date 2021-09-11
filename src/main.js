@@ -7,7 +7,7 @@ import PointsModel from './model/points.js';
 import { generatedPoints } from './mock/point.js';
 
 const pointsModel = new PointsModel();
-pointsModel.setTasks(generatedPoints);
+pointsModel.setPoints(generatedPoints);
 
 const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
@@ -19,4 +19,4 @@ render(siteTripControlsElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
 render(siteTripControlsElement, new FiltersView(), RenderPosition.BEFOREEND);
 render(siteHeaderElement, new TripInfoView(generatedPoints), RenderPosition.AFTERBEGIN);
 
-tripPresenter.init(generatedPoints);
+tripPresenter.init();
