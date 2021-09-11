@@ -1,5 +1,6 @@
 import AbstractView from './abstract.js';
 import { formatDate } from '../utils/date.js';
+import { extraOptions } from '../mock/point.js';
 
 export default class TripInfoView extends AbstractView {
   constructor (tripPoints) {
@@ -7,8 +8,10 @@ export default class TripInfoView extends AbstractView {
     this._tripPoints = tripPoints;
   }
 
-  _getOffersSumPrice (offers) {
-    return offers.map((offer) => offer.price).reduce((accumulator, a) => accumulator + a, 0);
+  _getOffersSumPrice (pointType, selectedOffersIds) {
+    const offersForType = extraOptions[pointType];
+    const selectedOffersData = offersForType.filter((offerData) => selectedOffersIds.includes(offerData.id));
+    return selectedOffersData.map((offer) => offer.price).reduce((accumulator, a) => accumulator + a, 0);
   }
 
   getTemplate () {
@@ -31,7 +34,9 @@ export default class TripInfoView extends AbstractView {
     </div>
       <p class="trip-info__cost">
       Total: &euro;&nbsp;<span class="trip-info__cost-value">
-      ${this._tripPoints.map((point) => point.basePrice + this._getOffersSumPrice(point.offers)).reduce((accumulator, a) => accumulator + a, 0)}
+      ${this._tripPoints.map(
+    (point) => point.basePrice + this._getOffersSumPrice(point.pointType, point.offers),
+  ).reduce((accumulator, a) => accumulator + a, 0)}
       </span>
     </p>
   </section>`;
