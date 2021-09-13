@@ -10,12 +10,12 @@ export const getTimeDiffDisplay = (startTime, endTime) => {
   const end = dayjs(endTime);
   const durationObj = dayjs.duration(end.diff(start));
 
-  if (durationObj.hours() < 1) {
-    return durationObj.format('mm[M]');
-  } else if (durationObj.hours() < 24) {
+  if (durationObj.days() >= 1) {
+    return durationObj.format('D[D] HH[H] mm[M]');
+  } else if (durationObj.hours() >= 1) {
     return durationObj.format('HH[H] mm[M]');
   } else {
-    return durationObj.format('dd[D] HH[H] mm[M]');
+    return durationObj.format('mm[M]');
   }
 };
 
@@ -34,3 +34,7 @@ export const getDatesDiff = (dateA, dateB) => dayjs(dateA).diff(dayjs(dateB));
 export const getDateHour = (date) => dayjs(date).hour();
 
 export const getCurrentDateStr = () => formatDate(dayjs(), 'DD/MM/YY HH:00');
+
+export const isDatesEqual = (dateA, dateB) => {
+  (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');
+};

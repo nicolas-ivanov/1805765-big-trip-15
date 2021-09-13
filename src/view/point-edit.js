@@ -18,14 +18,13 @@ export default class EditTripPointFormView extends SmartView {
   constructor (pointData = BLANK_POINT) {
     super();
     this._data = pointData;
-    this._data.offersCandidates = this._data.offers.slice();
     this._datepicker = null;
 
     this._rollUpClickHandler = this._rollUpClickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
+    this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._chooseEventTypeClickHandler = this._chooseEventTypeClickHandler.bind(this);
     this._chooseOffersClickHandler = this._chooseOffersClickHandler.bind(this);
-    // this._startTimeChangeHandler = this._dateChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -34,15 +33,15 @@ export default class EditTripPointFormView extends SmartView {
 
   _setDatepicker() {
     if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
+      this._datepicker.delete();
     }
+    this._datepicker = new Map();
 
     Object.entries(DATES_LABELS).forEach(([dateLabel, dateID]) => {
+      // flatpickr есть смысл инициализировать только в случае,
+      // если поле выбора даты доступно для заполнения
       if (this._data[dateLabel]) {
-        // flatpickr есть смысл инициализировать только в случае,
-        // если поле выбора даты доступно для заполнения
-        this._datepicker = flatpickr(
+        this._datepicker.set(dateLabel, flatpickr(
           this.getElement().querySelector(dateID),
           {
             enableTime: true,
@@ -51,10 +50,10 @@ export default class EditTripPointFormView extends SmartView {
             onChange: ([userDate]) => {
               this.updateData({
                 [dateLabel]: userDate,
-              });
+              }, true);
             },
           },
-        );
+        ));
       }
     });
   }
@@ -94,8 +93,8 @@ export default class EditTripPointFormView extends SmartView {
     const offerid = inputElement.dataset.offerid;
 
     this.updateData({
-      offersCandidates: toggleValueInArray(this._data.offersCandidates, offerid),
-    });
+      offers: toggleValueInArray(this._data.offers, offerid),
+    }, true);
   }
 
   _updateSubmitButtonEnabled() {
@@ -105,13 +104,15 @@ export default class EditTripPointFormView extends SmartView {
     const price = this.getElement().querySelector('.event__input--price');
 
     const inputs = [destination, startTime, endTime, price];
+    const prevIsSubmitEnabled = this._isSubmitEnabled;
     this._isSubmitEnabled = inputs.every(isNotEmptyInput);
 
-    const prevSubmitBtn = this.getElement().querySelector('.event__save-btn');
-    const parent = prevSubmitBtn.parentElement;
-
-    const newSubmitBtn = createElement(`<button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>`);
-    parent.replaceChild(newSubmitBtn, prevSubmitBtn);
+    if (this._isSubmitEnabled !== prevIsSubmitEnabled) {
+      const prevSubmitBtn = this.getElement().querySelector('.event__save-btn');
+      const parent = prevSubmitBtn.parentElement;
+      const newSubmitBtn = createElement(`<button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>`);
+      parent.replaceChild(newSubmitBtn, prevSubmitBtn);
+    }
   }
 
   _getInputHandler(field) {
@@ -138,13 +139,20 @@ export default class EditTripPointFormView extends SmartView {
     this.getElement().querySelector('.event__rollup-btn').removeEventListener('click', this._clickHandler);
     this.getElement().removeEventListener('submit', this._submitHandler);
     super.removeElement();
+
+    if (this._datepicker) {
+      this._datepicker.delete();
+      this._datepicker = null;
+    }
   }
 
   restoreHandlers() {
     this._setInnerHandlers();
     this.setSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.setRollUpClickHandler(this._callback.rollUpClick);
     this._setDatepicker();
+    this._isSubmitEnabled = this._updateSubmitButtonEnabled();
   }
 
   _setInnerHandlers() {
@@ -158,14 +166,22 @@ export default class EditTripPointFormView extends SmartView {
 
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._getInputHandler('destination'));
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._getInputHandler('basePrice'));
-    this.getElement().querySelector('#event-start-time-1').addEventListener('input', this._getInputHandler('startTime'));
-    this.getElement().querySelector('#event-end-time-1').addEventListener('input', this._getInputHandler('endTime'));
+  }
+
+  _formDeleteClickHandler(evt) {
+    evt.preventDefault();
+    const parsedPoint = EditTripPointFormView.parseDataToPoint(this._data);
+    this._callback.deleteClick(parsedPoint);
+  }
+
+  setDeleteClickHandler(callback) {
+    this._callback.deleteClick = callback;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._formDeleteClickHandler);
   }
 
 
   static parsePointToData(point) {
     const pointData = Object.assign({}, point);
-    pointData.offersCandidates = pointData.offers.slice();
     return pointData;
   }
 
@@ -293,7 +309,7 @@ export default class EditTripPointFormView extends SmartView {
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
         <div class="event__available-offers">
-          ${this._getOffersDisplay(extraOptions[this._data.pointType], this._data.offersCandidates)}
+          ${this._getOffersDisplay(extraOptions[this._data.pointType], this._data.offers)}
         </div>
       </section>
 

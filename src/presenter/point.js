@@ -1,7 +1,8 @@
 import {render, RenderPosition, replace, remove} from '../utils/render.js';
 import TripPointView from '../view/point.js';
 import TripPointEditView from '../view/point-edit.js';
-import {UserAction, UpdateType} from '../const.js';
+import { UserAction, UpdateType } from '../const.js';
+import { isDatesEqual } from '../utils/date.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -24,6 +25,7 @@ export default class Point {
     this._handleCollapseClick = this._handleCollapseClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
+    this._handleDeleteClick = this._handleDeleteClick.bind(this);
   }
 
   init(point) {
@@ -39,6 +41,7 @@ export default class Point {
     this._pointComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._pointEditComponent.setSubmitHandler(this._handleFormSubmit);
     this._pointEditComponent.setRollUpClickHandler(this._handleCollapseClick);
+    this._pointEditComponent.setDeleteClickHandler(this._handleDeleteClick);
 
     if (prevPointComponent === null) {
       render(this._pointsListContainer, this._pointComponent, RenderPosition.BEFOREEND);
@@ -71,7 +74,7 @@ export default class Point {
 
   _handleFavoriteClick() {
     this._changeData(
-      UserAction.UPDATE_TASK,
+      UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       Object.assign(
         {},
@@ -108,13 +111,26 @@ export default class Point {
     this._replaceCardToForm();
   }
 
-  _handleFormSubmit(point) {
+  _handleFormSubmit(update) {
+    const isMinorUpdate =
+      !isDatesEqual(this._point.startTime, update.startTime) ||
+      this._point.destination !== update.destination ||
+      this._point.basePrice !== update.basePrice;
+
     this._changeData(
-      UserAction.UPDATE_TASK,
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update,
+    );
+    this._replaceFormToCard();
+  }
+
+  _handleDeleteClick(point) {
+    this._changeData(
+      UserAction.DELETE_POINT,
       UpdateType.MINOR,
       point,
     );
-    this._replaceFormToCard();
   }
 
   _handleCollapseClick() {
