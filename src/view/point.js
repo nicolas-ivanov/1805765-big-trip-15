@@ -1,3 +1,4 @@
+import he from 'he';
 import AbstractView from './abstract.js';
 import { getTimeDiffDisplay, formatDate } from '../utils/date.js';
 import { extraOptions } from '../mock/point.js';
@@ -67,7 +68,7 @@ export default class TripPointView extends AbstractView {
     <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${this._pointData.pointType}.png" alt="Event type icon">
     </div>
-    <h3 class="event__title">${this._pointData.pointType} ${this._pointData.destination}</h3>
+    <h3 class="event__title">${this._pointData.pointType} ${he.encode(this._pointData.destination)}</h3>
     <div class="event__schedule">
         <p class="event__time">
         <time class="event__start-time" datetime="2019-03-18Thh:mm">${formatDate(start, 'HH:mm')}</time>
@@ -77,7 +78,7 @@ export default class TripPointView extends AbstractView {
         <p class="event__duration">${getTimeDiffDisplay(start, end)}</p>
     </div>
     <p class="event__price">
-        &euro;&nbsp;<span class="event__price-value">${this._pointData.basePrice}</span>
+        &euro;&nbsp;<span class="event__price-value">${he.encode(this._pointData.basePrice.toString())}</span>
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
