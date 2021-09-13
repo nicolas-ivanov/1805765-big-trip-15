@@ -22,7 +22,7 @@ export const getTimeDiffDisplay = (startTime, endTime) => {
 export const formatDate = (date, formatString) => dayjs(date).format(formatString);
 
 export const generateDatePair = () => {
-  const start = dayjs().add(getRandomInteger(0, 100), 'hour').minute(0);
+  const start = dayjs().add(getRandomInteger(-100, 100), 'hour').minute(0);
   const minutesValues = [30, 60, 90, 1440, 1470, 1500, 1560];
   const end = start.add(minutesValues[getRandomInteger(0, minutesValues.length - 1)], 'minutes');
 
@@ -38,3 +38,5 @@ export const getCurrentDateStr = () => formatDate(dayjs(), 'DD/MM/YY HH:00');
 export const isDatesEqual = (dateA, dateB) => {
   (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');
 };
+
+export const isDateInPast = (date) => getDatesDiff(dayjs(), date) > 0;
