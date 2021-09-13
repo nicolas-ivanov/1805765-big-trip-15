@@ -5,12 +5,12 @@ const createFilterItemTemplate = (filter, currentFilterType) => {
 
   return (
     `<div class="trip-filters__filter">
-        <input id="filter-everything" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" 
+        <input id="filter-${type}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" 
           value="${type}" 
           ${type === currentFilterType ? 'checked' : ''} 
           ${count === 0 ? 'disabled' : ''} 
         >
-        <label class="trip-filters__filter-label" for="filter-everything">
+        <label class="trip-filters__filter-label" for="filter-${type}">
           ${name} <span class="filter__${name}-count">${count}</span>
         </label>
     </div>`
@@ -46,13 +46,23 @@ export default class FiltersView extends AbstractView {
   }
 
   _filterTypeChangeHandler(evt) {
+    const goodLabels = ['LABEL', 'SPAN'];
+
+    if (!(goodLabels.includes(evt.target.tagName))) {
+      return;
+    }
+
+    const labelElement = evt.target.tagName === 'SPAN' ? evt.target.parentNode : evt.target;
+    const inputId = labelElement.getAttribute('for');
+    const filterType = document.getElementById(inputId).getAttribute('value');
+
     evt.preventDefault();
-    this._callback.filterTypeChange(evt.target.value);
+    this._callback.filterTypeChange(filterType);
   }
 
   setFilterTypeChangeHandler(callback) {
     this._callback.filterTypeChange = callback;
-    this.getElement().addEventListener('change', this._filterTypeChangeHandler);
+    this.getElement().addEventListener('click', this._filterTypeChangeHandler);
   }
 
 }

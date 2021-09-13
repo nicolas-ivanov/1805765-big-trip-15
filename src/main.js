@@ -22,5 +22,5 @@ render(siteHeaderElement, new TripInfoView(generatedPoints), RenderPosition.AFTE
 const filterPresenter = new FilterPresenter(siteTripControlsElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const tripPresenter = new TripListPresenter(tripListContainer, pointsModel);
+const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
 tripPresenter.init();
