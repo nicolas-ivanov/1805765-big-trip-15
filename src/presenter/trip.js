@@ -1,4 +1,5 @@
 import PointPresenter from './point.js';
+import PointNewPresenter from './point-new.js';
 import SortingView from '../view/sorting.js';
 import TripPointsListView from '../view/trip-points-list.js';
 import NoPointsView from '../view/no-points.js';
@@ -29,11 +30,19 @@ export default class Trip {
 
     this._pointsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+
+    this._pointNewPresenter = new PointNewPresenter(this._tripListContainer, this._handleViewAction);
   }
 
   init() {
     render(this._tripListContainer, this._pointsListComponent, RenderPosition.BEFOREEND);
     this._renderTripList();
+  }
+
+  createPoint() {
+    this._currentSortType = SortType.DEFAULT;
+    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+    this._pointNewPresenter.init();
   }
 
   _getPoints() {
@@ -93,6 +102,7 @@ export default class Trip {
   }
 
   _clearTripList({resetSortType = false} = {}) {
+    this._pointNewPresenter.destroy();
     this._pointPresenter.forEach((presenter) => presenter.destroy());
     this._pointPresenter.clear();
 
@@ -113,6 +123,7 @@ export default class Trip {
   }
 
   _handleModeChange() {
+    this._pointNewPresenter.destroy();
     this._pointPresenter.forEach((presenter) => presenter.resetView());
   }
 

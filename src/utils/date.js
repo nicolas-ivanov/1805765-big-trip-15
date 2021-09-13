@@ -33,7 +33,7 @@ export const getDatesDiff = (dateA, dateB) => dayjs(dateA).diff(dayjs(dateB));
 
 export const getDateHour = (date) => dayjs(date).hour();
 
-export const getCurrentDateStr = () => formatDate(dayjs(), 'DD/MM/YY HH:00');
+export const getCurrentDate = () => dayjs();
 
 export const isDatesEqual = (dateA, dateB) => {
   (dateA === null && dateB === null) ? true : dayjs(dateA).isSame(dateB, 'D');

@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { getRandomInteger, getRandomArrayElements } from '../utils/common.js';
-import { generateDatePair, getCurrentDateStr } from '../utils/date.js';
+import { generateDatePair, getCurrentDate } from '../utils/date.js';
 
 const POINTS_COUNT = 10;
 
@@ -130,26 +130,47 @@ export const extraOptions = {
   ],
 };
 
-export const CITIES = [
-  'Moscow',
-  'San Francisco',
-  'Amsterdam',
-  'Chamonix',
-  'Geneva',
-  'Tokio',
-];
-
-const lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras aliquet varius magna, non porta ligula feugiat eget. Fusce tristique felis at fermentum pharetra. Aliquam id orci ut lectus varius viverra. Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante. Phasellus eros mauris, condimentum sed nibh vitae, sodales efficitur ipsum. Sed blandit, eros vel aliquam faucibus, purus ex euismod diam, eu luctus nunc ante ut dui. Sed sed nisi sed augue convallis suscipit in sed felis. Aliquam erat volutpat. Nunc fermentum tortor ac porta dapibus. In rutrum ac purus sit amet tempus.';
-const loremList = lorem.split('. ');
-
 const getPhoto = () => `http://picsum.photos/248/152?r=${  Math.random()}`;
+
+export const cities = [
+  {
+    name: 'Moscow',
+    description: 'Moscow is the best city in the world. It is super nice and stuff. They paid me a whole sh*t of money to write these lines, so I can not help praising these bastards, I mean, trully amazing people. Come visit Moscow ASAP. Cheers.',
+    photos: new Array(getRandomInteger(1, 4)).fill().map(() => getPhoto()),
+  },
+  {
+    name: 'San Francisco',
+    description: 'San Francisco is the best city in the world. It is super nice and stuff. They paid me a whole sh*t of money to write these lines, so I can not help praising these bastards, I mean, trully amazing people. Come visit San Francisco ASAP. Cheers.',
+    photos: new Array(getRandomInteger(1, 4)).fill().map(() => getPhoto()),
+  },
+  {
+    name: 'Amsterdam',
+    description: 'Amsterdam is the best city in the world. It is super nice and stuff. They paid me a whole sh*t of money to write these lines, so I can not help praising these bastards, I mean, trully amazing people. Come visit Amsterdam ASAP. Cheers.',
+    photos: new Array(getRandomInteger(1, 4)).fill().map(() => getPhoto()),
+  },
+  {
+    name: 'Chamonix',
+    description: 'Chamonix is the best city in the world. It is super nice and stuff. They paid me a whole sh*t of money to write these lines, so I can not help praising these bastards, I mean, trully amazing people. Come visit Chamonix ASAP. Cheers.',
+    photos: new Array(getRandomInteger(1, 4)).fill().map(() => getPhoto()),
+  },
+  {
+    name: 'Geneva',
+    description: 'Geneva is the best city in the world. It is super nice and stuff. They paid me a whole sh*t of money to write these lines, so I can not help praising these bastards, I mean, trully amazing people. Come visit Geneva ASAP. Cheers.',
+    photos: new Array(getRandomInteger(1, 4)).fill().map(() => getPhoto()),
+  },
+  {
+    name: 'Tokio',
+    description: 'Tokio is the best city in the world. It is super nice and stuff. They paid me a whole sh*t of money to write these lines, so I can not help praising these bastards, I mean, trully amazing people. Come visit Tokio ASAP. Cheers.',
+    photos: new Array(getRandomInteger(1, 4)).fill().map(() => getPhoto()),
+  },
+];
 
 const getSelecteOptionsIDs = (pointType) => extraOptions[pointType].map((optionData) => optionData.id);
 
 export const generatePoint = () => {
   const selectedPointType = POINT_TYPE[getRandomInteger(0, POINT_TYPE.length - 1)];
+  const selectedCity = cities[getRandomInteger(0, cities.length - 1)];
   const selectedOptions = getSelecteOptionsIDs(selectedPointType);
-
   const [start, end] = generateDatePair();
 
   return {
@@ -158,10 +179,10 @@ export const generatePoint = () => {
     startTime: start,
     endTime: end,
     pointType: selectedPointType,
-    destination: CITIES[getRandomInteger(0, CITIES.length - 1)],
+    destination: selectedCity.name,
     offers: getRandomArrayElements(selectedOptions, getRandomInteger(0, selectedOptions.length - 1)),
-    description: loremList.slice(0, getRandomInteger(1, 5)),
-    photos: new Array(getRandomInteger(3, 5)).fill().map(() => getPhoto()),
+    description: selectedCity.description,
+    photos: selectedCity.photos,
     isFavorite: !getRandomInteger(0, 1),
   };
 };
@@ -169,7 +190,7 @@ export const generatePoint = () => {
 export const generatedPoints = Array.from(Array(POINTS_COUNT), generatePoint);
 
 const DEFAULT_POINT_TYPE = 'taxi';
-const CURRENT_DATE = getCurrentDateStr();
+const CURRENT_DATE = getCurrentDate();
 
 export const BLANK_POINT = {
   pointType: DEFAULT_POINT_TYPE,
@@ -177,7 +198,7 @@ export const BLANK_POINT = {
   startTime: CURRENT_DATE,
   endTime:  CURRENT_DATE,
   destination: null,
-  offers: getSelecteOptionsIDs(DEFAULT_POINT_TYPE),
+  offers: [],
   description: null,
   photos: null,
   isFavorite: null,

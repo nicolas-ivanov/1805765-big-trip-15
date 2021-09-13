@@ -1,6 +1,6 @@
 import SmartView from './smart.js';
-import { CITIES, extraOptions, BLANK_POINT } from '../mock/point.js';
-import { formatDate } from '../utils/date.js';
+import { cities, extraOptions, BLANK_POINT } from '../mock/point.js';
+import { formatDate, getDatesDiff } from '../utils/date.js';
 import { toggleValueInArray, isNotEmptyInput } from '../utils/common.js';
 import { createElement } from '../utils/render.js';
 import flatpickr from 'flatpickr';
@@ -25,6 +25,7 @@ export default class PointEditView extends SmartView {
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._chooseEventTypeClickHandler = this._chooseEventTypeClickHandler.bind(this);
     this._chooseOffersClickHandler = this._chooseOffersClickHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepicker();
@@ -40,6 +41,7 @@ export default class PointEditView extends SmartView {
     Object.entries(DATES_LABELS).forEach(([dateLabel, dateID]) => {
       // flatpickr есть смысл инициализировать только в случае,
       // если поле выбора даты доступно для заполнения
+
       if (this._data[dateLabel]) {
         this._datepicker.set(dateLabel, flatpickr(
           this.getElement().querySelector(dateID),
@@ -51,6 +53,7 @@ export default class PointEditView extends SmartView {
               this.updateData({
                 [dateLabel]: userDate,
               }, true);
+              this._updateSubmitButtonEnabled();
             },
           },
         ));
@@ -105,7 +108,8 @@ export default class PointEditView extends SmartView {
 
     const inputs = [destination, startTime, endTime, price];
     const prevIsSubmitEnabled = this._isSubmitEnabled;
-    this._isSubmitEnabled = inputs.every(isNotEmptyInput);
+    const isDateRangeConsistent = getDatesDiff(this._data.endTime, this._data.startTime) > 0;
+    this._isSubmitEnabled = inputs.every(isNotEmptyInput) && isDateRangeConsistent;
 
     if (this._isSubmitEnabled !== prevIsSubmitEnabled) {
       const prevSubmitBtn = this.getElement().querySelector('.event__save-btn');
@@ -123,6 +127,26 @@ export default class PointEditView extends SmartView {
         [field]: evt.target.value,
       }, true);
     };
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+    const selectedCity = cities.filter( (city) => city.name === evt.target.value )[0] || '';
+
+    if (!selectedCity) {
+      this.updateData({
+        destination: evt.target.value,
+        description: '',
+        photos: [],
+      });
+      return;
+    }
+
+    this.updateData({
+      destination: selectedCity.name,
+      description: selectedCity.description,
+      photos: selectedCity.photos,
+    });
   }
 
   _submitHandler(evt) {
@@ -166,6 +190,7 @@ export default class PointEditView extends SmartView {
 
     this.getElement().querySelector('.event__input--destination').addEventListener('input', this._getInputHandler('destination'));
     this.getElement().querySelector('.event__input--price').addEventListener('input', this._getInputHandler('basePrice'));
+    this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
   }
 
   _formDeleteClickHandler(evt) {
@@ -205,6 +230,32 @@ export default class PointEditView extends SmartView {
           <span class="event__offer-price">${offer.price}</span>
         </label>
       </div>`).join('');
+  }
+
+  _getPhotosTemplate (photos) {
+    if (photos === null) {
+      return '';
+    }
+    return photos.map((photo) => (
+      `<img class="event__photo" src='${photo}' alt="Event photo">`
+    )).join('');
+  }
+
+  _getDescriptionDisplay() {
+    if (!this._data.description) {
+      return '';
+    }
+
+    return `<section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+    <p class="event__destination-description">${this._data.description || '' }</p>
+
+    <div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${this._getPhotosTemplate(this._data.photos)}
+      </div>
+    </div>
+  </section>`;
   }
 
   getTemplate () {
@@ -276,9 +327,9 @@ export default class PointEditView extends SmartView {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${this._data.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1">
         <datalist id="destination-list-1">
-          ${CITIES.map((city) => (`<option value="${  city  }"></option>`)).join('')}
+          ${cities.map((city) => (`<option value="${  city.name  }"></option>`)).join('')}
         </datalist>
       </div>
 
@@ -295,7 +346,7 @@ export default class PointEditView extends SmartView {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._data.basePrice}">
+        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._data.basePrice || ''}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>
@@ -313,10 +364,7 @@ export default class PointEditView extends SmartView {
         </div>
       </section>
 
-      <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${this._data.description}</p>
-      </section>
+      ${this._getDescriptionDisplay()}
     </section>
   </form>`;
   }
