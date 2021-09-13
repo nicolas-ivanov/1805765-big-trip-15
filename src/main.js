@@ -4,10 +4,13 @@ import FiltersView from './view/filters.js';
 import TripInfoView from './view/trip-info.js';
 import TripListPresenter from './presenter/trip.js';
 import PointsModel from './model/points.js';
+import FilterModel from './model/filter.js';
 import { generatedPoints } from './mock/point.js';
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(generatedPoints);
+
+const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
