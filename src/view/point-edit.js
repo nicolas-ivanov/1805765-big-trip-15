@@ -14,7 +14,7 @@ const DATES_LABELS = {
 };
 
 
-export default class EditTripPointFormView extends SmartView {
+export default class PointEditView extends SmartView {
   constructor (pointData = BLANK_POINT) {
     super();
     this._data = pointData;
@@ -170,7 +170,7 @@ export default class EditTripPointFormView extends SmartView {
 
   _formDeleteClickHandler(evt) {
     evt.preventDefault();
-    const parsedPoint = EditTripPointFormView.parseDataToPoint(this._data);
+    const parsedPoint = PointEditView.parseDataToPoint(this._data);
     this._callback.deleteClick(parsedPoint);
   }
 
@@ -191,7 +191,7 @@ export default class EditTripPointFormView extends SmartView {
 
   reset(pointOriginal) {
     this.updateData(
-      EditTripPointFormView.parsePointToData(pointOriginal),
+      PointEditView.parsePointToData(pointOriginal),
     );
   }
 
