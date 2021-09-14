@@ -325,7 +325,10 @@ export default class PointEditView extends SmartView {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${this._data.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1"
+          pattern="${cities.map((city) => city.name).join('|')}"
+          title='Must be ${cities.map((city) => `"${ city.name }"`).join(' or ')}'>
+        >
         <datalist id="destination-list-1">
           ${cities.map((city) => (`<option value="${  city.name  }"></option>`)).join('')}
         </datalist>
