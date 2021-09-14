@@ -1,6 +1,6 @@
 import AbstractView from './abstract.js';
 import { formatDate } from '../utils/date.js';
-import { getTotalPrice } from '../utils/price.js';
+import { getTotalPrice } from '../utils/point.js';
 
 export default class TripInfoView extends AbstractView {
   constructor (tripPoints) {

@@ -1,8 +1,8 @@
 import SmartView from './smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { getTotalPrice, getTotalDuration } from '../utils/price.js';
-import { simultaneousSort } from '../utils/sort.js';
+import { getTotalPrice, getTotalDuration } from '../utils/point.js';
+import { simultaneousSort } from '../utils/common.js';
 import { getTimeDiffDisplayFromMSec } from '../utils/date.js';
 
 
@@ -27,7 +27,6 @@ const barChart = (title, context, labels, data, customFormatter) => new Chart(co
         color: '#000000',
         anchor: 'end',
         align: 'start',
-        // formatter: (val) => '€ ${val}',
         formatter: customFormatter,
       },
     },
@@ -37,6 +36,10 @@ const barChart = (title, context, labels, data, customFormatter) => new Chart(co
       fontColor: '#000000',
       fontSize: 23,
       position: 'left',
+    },
+    datasets: {
+      barThickness: 44,
+      minBarLength: 50,
     },
     scales: {
       yAxes: [{
@@ -49,7 +52,6 @@ const barChart = (title, context, labels, data, customFormatter) => new Chart(co
           display: false,
           drawBorder: false,
         },
-        barThickness: 44,
       }],
       xAxes: [{
         ticks: {
@@ -60,7 +62,6 @@ const barChart = (title, context, labels, data, customFormatter) => new Chart(co
           display: false,
           drawBorder: false,
         },
-        minBarLength: 50,
       }],
     },
     legend: {
@@ -141,8 +142,5 @@ export default class Statistics extends SmartView {
     barChart('MONEY', moneyCtx, pointTypesSortedByMoney, moneyDataSorted, moneyFormatter);
     barChart('TYPE', typeCtx, pointTypesSortedByTypesCount, typesCountDataSorted, typeCountFormatter);
     barChart('TIME-SPEND', timeCtx, pointTypesSortedByTimeSpend, timeSpendDataSorted, timeSpendFormatter);
-
-    // this._moneyChart = renderColorsChart(colorsCtx, tasks);
-    // this._daysChart = renderDaysChart(daysCtx, tasks, dateFrom, dateTo);
   }
 }
