@@ -25,3 +25,9 @@ export const FilterType = {
   PAST: 'past',
   FAVORITES: 'favourites',
 };
+
+export const MenuItem = {
+  ADD_NEW_POINT: 'ADD_NEW_POINT',
+  POINTS: 'POINTS',
+  STATISTICS: 'STATISTICS',
+};

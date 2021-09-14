@@ -6,6 +6,7 @@ import TripInfoPresenter from './presenter/trip-info.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import { generatedPoints } from './mock/point.js';
+import { MenuItem } from './const.js';
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(generatedPoints);
@@ -16,7 +17,29 @@ const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
 const tripListContainer = document.querySelector('.trip-events');
 
-render(siteTripControlsElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
+const siteMenuComponent = new SiteMenuView();
+render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
+
+const handleSiteMenuClick = (menuItem) => {
+  switch (menuItem) {
+    case MenuItem.ADD_NEW_TASK:
+      // Скрыть статистику
+      // Показать доску
+      // Показать форму добавления новой задачи
+      // Убрать выделение с ADD NEW TASK после сохранения
+      break;
+    case MenuItem.TASKS:
+      // Показать доску
+      // Скрыть статистику
+      break;
+    case MenuItem.STATISTICS:
+      // Скрыть доску
+      // Показать статистику
+      break;
+  }
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
 
 const tripInfoPresenter = new TripInfoPresenter(siteHeaderElement, pointsModel);
 tripInfoPresenter.init();
