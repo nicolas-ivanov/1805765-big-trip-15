@@ -23,4 +23,5 @@ export const FilterType = {
   ALL: 'all',
   FUTURE: 'future',
   PAST: 'past',
+  FAVORITES: 'favourites',
 };

@@ -65,6 +65,11 @@ export default class Filter {
         name: 'Future',
         count: filter[FilterType.FUTURE](points).length,
       },
+      {
+        type: FilterType.FAVORITES,
+        name: 'Favorites',
+        count: filter[FilterType.FAVORITES](points).length,
+      },
     ];
   }
 }
