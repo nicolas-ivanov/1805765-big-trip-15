@@ -18,7 +18,8 @@ export const getRandomArrayElements = (arr, arrLength) => {
   return result;
 };
 
-export const toggleValueInArray = (arr, value) => {
+export const toggleValueInArray = (arrOriginal, value) => {
+  const arr = arrOriginal.slice();
   const index = arr.indexOf(value);
 
   if (index === -1) {
