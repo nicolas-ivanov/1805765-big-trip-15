@@ -6,7 +6,7 @@ import TripInfoPresenter from './presenter/trip-info.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
 import { generatedPoints } from './mock/point.js';
-import { MenuItem } from './const.js';
+import { MenuItem, UpdateType, FilterType } from './const.js';
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(generatedPoints);
@@ -24,16 +24,16 @@ const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.ADD_NEW_TASK:
       // Скрыть статистику
-      // Показать доску
-      // Показать форму добавления новой задачи
-      // Убрать выделение с ADD NEW TASK после сохранения
+      TripListPresenter.destroy();
+      filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+      TripListPresenter.init();
       break;
     case MenuItem.TASKS:
-      // Показать доску
+      TripListPresenter.init();
       // Скрыть статистику
       break;
     case MenuItem.STATISTICS:
-      // Скрыть доску
+      TripListPresenter.destroy();
       // Показать статистику
       break;
   }
