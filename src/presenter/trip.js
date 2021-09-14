@@ -18,7 +18,7 @@ export default class Trip {
     this._currentSortType = SortType.DEFAULT;
 
     this._sortComponent = null;
-    this._noTaskComponent = null;
+    this._noPointsComponent = null;
 
     this._pointsListComponent = new TripPointsListView();
 

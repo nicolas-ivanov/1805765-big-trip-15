@@ -1,4 +1,4 @@
-import { render, RenderPosition } from './utils/render.js';
+import { render, RenderPosition, remove } from './utils/render.js';
 import SiteMenuView from './view/site-menu.js';
 import StatisticsView from './view/statistics.js';
 import TripListPresenter from './presenter/trip.js';
@@ -18,42 +18,52 @@ const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
 const tripListContainer = document.querySelector('.trip-events');
 
-const siteMenuComponent = new SiteMenuView();
-render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
-
-const handleSiteMenuClick = (menuItem) => {
-  switch (menuItem) {
-    case MenuItem.ADD_NEW_TASK:
-      // Скрыть статистику
-      TripListPresenter.destroy();
-      filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
-      TripListPresenter.init();
-      break;
-    case MenuItem.TASKS:
-      TripListPresenter.init();
-      // Скрыть статистику
-      break;
-    case MenuItem.STATISTICS:
-      TripListPresenter.destroy();
-      // Показать статистику
-      break;
-  }
-};
-
-siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-
 const tripInfoPresenter = new TripInfoPresenter(siteHeaderElement, pointsModel);
 tripInfoPresenter.init();
 
 const filterPresenter = new FilterPresenter(siteTripControlsElement, filterModel, pointsModel);
 filterPresenter.init();
 
-// const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
-// tripPresenter.init();
+const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
+tripPresenter.init();
 
-// document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
-//   evt.preventDefault();
-//   tripPresenter.createPoint();
-// });
+const siteMenuComponent = new SiteMenuView();
+render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
 
-render(tripListContainer, new StatisticsView(pointsModel.getPoints()), RenderPosition.BEFOREEND);
+let statisticsComponent = null;
+let currentMenuItem = MenuItem.POINTS;
+
+const handleSiteMenuClick = (menuItem) => {
+  if (menuItem === currentMenuItem) {
+    return;
+  }
+  currentMenuItem = menuItem;
+  siteMenuComponent.setMenuItem(currentMenuItem);
+
+  switch (menuItem) {
+    case MenuItem.POINTS:
+      tripPresenter.init();
+      remove(statisticsComponent);
+      break;
+    case MenuItem.STATISTICS:
+      tripPresenter.destroy();
+      statisticsComponent = new StatisticsView(pointsModel.getPoints());
+      render(tripListContainer, statisticsComponent, RenderPosition.BEFOREEND);
+      break;
+  }
+};
+
+siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+
+document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+  evt.preventDefault();
+  remove(statisticsComponent);
+  tripPresenter.destroy();
+
+  currentMenuItem = MenuItem.POINTS;
+  siteMenuComponent.setMenuItem(currentMenuItem);
+
+  filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
+  tripPresenter.init();
+  tripPresenter.createPoint();
+});
