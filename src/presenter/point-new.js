@@ -1,7 +1,7 @@
 import PointEditView from '../view/point-edit.js';
-import {nanoid} from 'nanoid';
-import {remove, render, RenderPosition} from '../utils/render.js';
-import {UserAction, UpdateType} from '../const.js';
+import { nanoid } from 'nanoid';
+import { remove, render, RenderPosition } from '../utils/render.js';
+import { UserAction, UpdateType } from '../const.js';
 
 export default class PointNew {
   constructor(pointsListContainer, changeData) {

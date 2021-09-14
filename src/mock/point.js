@@ -2,7 +2,7 @@ import { nanoid } from 'nanoid';
 import { getRandomInteger, getRandomArrayElements } from '../utils/common.js';
 import { generateDatePair, getCurrentDate } from '../utils/date.js';
 
-const POINTS_COUNT = 10;
+const POINTS_COUNT = 7;
 
 const POINT_TYPE = [
   'taxi',

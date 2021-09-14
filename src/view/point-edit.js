@@ -25,6 +25,7 @@ export default class PointEditView extends SmartView {
     this._formDeleteClickHandler = this._formDeleteClickHandler.bind(this);
     this._chooseEventTypeClickHandler = this._chooseEventTypeClickHandler.bind(this);
     this._chooseOffersClickHandler = this._chooseOffersClickHandler.bind(this);
+    this._basePriceInputHandler = this._basePriceInputHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
 
     this._setInnerHandlers();
@@ -39,9 +40,9 @@ export default class PointEditView extends SmartView {
     this._datepicker = new Map();
 
     Object.entries(DATES_LABELS).forEach(([dateLabel, dateID]) => {
+
       // flatpickr есть смысл инициализировать только в случае,
       // если поле выбора даты доступно для заполнения
-
       if (this._data[dateLabel]) {
         this._datepicker.set(dateLabel, flatpickr(
           this.getElement().querySelector(dateID),
@@ -119,14 +120,12 @@ export default class PointEditView extends SmartView {
     }
   }
 
-  _getInputHandler(field) {
-    return (evt) => {
-      evt.preventDefault();
-      this._updateSubmitButtonEnabled();
-      this.updateData({
-        [field]: evt.target.value,
-      }, true);
-    };
+  _basePriceInputHandler(evt) {
+    evt.preventDefault();
+    this._updateSubmitButtonEnabled();
+    this.updateData({
+      basePrice: parseInt(evt.target.value, 10),
+    }, true);
   }
 
   _destinationChangeHandler(evt) {
@@ -188,8 +187,7 @@ export default class PointEditView extends SmartView {
       element.addEventListener('click', this._chooseOffersClickHandler);
     });
 
-    this.getElement().querySelector('.event__input--destination').addEventListener('input', this._getInputHandler('destination'));
-    this.getElement().querySelector('.event__input--price').addEventListener('input', this._getInputHandler('basePrice'));
+    this.getElement().querySelector('.event__input--price').addEventListener('input', this._basePriceInputHandler);
     this.getElement().querySelector('.event__input--destination').addEventListener('change', this._destinationChangeHandler);
   }
 
@@ -346,7 +344,7 @@ export default class PointEditView extends SmartView {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._data.basePrice || ''}">
+        <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${this._data.basePrice || ''}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>
