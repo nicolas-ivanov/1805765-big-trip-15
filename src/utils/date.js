@@ -4,11 +4,8 @@ import { getRandomInteger } from './common.js';
 
 dayjs.extend(duration);
 
-
-export const getTimeDiffDisplay = (startTime, endTime) => {
-  const start = dayjs(startTime);
-  const end = dayjs(endTime);
-  const durationObj = dayjs.duration(end.diff(start));
+export const getTimeDiffDisplayFromMSec = (milliseconds) => {
+  const durationObj = dayjs.duration(milliseconds);
 
   if (durationObj.days() >= 1) {
     return durationObj.format('D[D] HH[H] mm[M]');
@@ -17,6 +14,13 @@ export const getTimeDiffDisplay = (startTime, endTime) => {
   } else {
     return durationObj.format('mm[M]');
   }
+};
+
+export const getTimeDiffDisplay = (startTime, endTime) => {
+  const start = dayjs(startTime);
+  const end = dayjs(endTime);
+
+  return getTimeDiffDisplayFromMSec(end.diff(start));
 };
 
 export const formatDate = (date, formatString) => dayjs(date).format(formatString);

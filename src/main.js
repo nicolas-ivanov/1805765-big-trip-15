@@ -1,5 +1,6 @@
 import { render, RenderPosition } from './utils/render.js';
 import SiteMenuView from './view/site-menu.js';
+import StatisticsView from './view/statistics.js';
 import TripListPresenter from './presenter/trip.js';
 import FilterPresenter from './presenter/filter.js';
 import TripInfoPresenter from './presenter/trip-info.js';
@@ -47,10 +48,12 @@ tripInfoPresenter.init();
 const filterPresenter = new FilterPresenter(siteTripControlsElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
-tripPresenter.init();
+// const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
+// tripPresenter.init();
 
-document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
-  evt.preventDefault();
-  tripPresenter.createPoint();
-});
+// document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
+//   evt.preventDefault();
+//   tripPresenter.createPoint();
+// });
+
+render(tripListContainer, new StatisticsView(pointsModel.getPoints()), RenderPosition.BEFOREEND);
