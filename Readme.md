@@ -51,4 +51,4 @@ git clone SSH-адрес_вашего_форка
 [check-image]: https://github.com/htmlacademy-ecmascript/1805765-big-trip-15/workflows/Project%20check/badge.svg?branch=master
 [check-url]: https://github.com/htmlacademy-ecmascript/1805765-big-trip-15/actions
 
-Изменение для пустого пула: module4-task1
+Изменение для пустого пула: module5-task1
