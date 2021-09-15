@@ -1,5 +1,8 @@
-export const siteFilters = () => (
-  `<div class="trip-controls__filters">
+import AbstractView from './abstract.js';
+
+export default class FiltersView extends AbstractView {
+  getTemplate () {
+    return `<div class="trip-controls__filters">
     <h2 class="visually-hidden">Filter events</h2>
     <form class="trip-filters" action="#" method="get">
       <div class="trip-filters__filter">
@@ -19,5 +22,6 @@ export const siteFilters = () => (
   
       <button class="visually-hidden" type="submit">Accept filter</button>
     </form>
-  </div>`
-);
+  </div>`;
+  }
+}

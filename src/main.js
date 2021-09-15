@@ -1,36 +1,18 @@
-import { siteMenu } from './view/site-menu.js';
-import { siteFilters } from './view/filters.js';
-import { tripInfo } from './view/trip-info.js';
-import { tripCost } from './view/trip-cost.js';
-import { sortingForm } from './view/sorting.js';
-import { tripPoint } from './view/trip-point.js';
-import { newPointForm } from './view/add-new-point.js';
-import { editTripPointForm } from './view/edit-point.js';
-
-const POINTS_COUNT = 3;
-
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, template);
-};
+import { render, RenderPosition } from './utils/render.js';
+import SiteMenuView from './view/site-menu.js';
+import FiltersView from './view/filters.js';
+import TripInfoView from './view/trip-info.js';
+import TripListPresenter from './presenter/trip.js';
+import { generatedPoints } from './mock/point.js';
 
 const siteHeaderElement = document.querySelector('.trip-main');
 const siteTripControlsElement = siteHeaderElement.querySelector('.trip-controls__navigation');
+const tripListContainer = document.querySelector('.trip-events');
 
-render(siteTripControlsElement, siteMenu(), 'afterbegin');
-render(siteTripControlsElement, siteFilters(), 'beforeend');
-render(siteHeaderElement, tripInfo(), 'afterbegin');
+const tripPresenter = new TripListPresenter(tripListContainer);
 
-const siteTripInfoElement = siteHeaderElement.querySelector('.trip-main__trip-info');
-render(siteTripInfoElement, tripCost(), 'beforeend');
+render(siteTripControlsElement, new SiteMenuView(), RenderPosition.AFTERBEGIN);
+render(siteTripControlsElement, new FiltersView(), RenderPosition.BEFOREEND);
+render(siteHeaderElement, new TripInfoView(generatedPoints), RenderPosition.AFTERBEGIN);
 
-const siteEventsElement = document.querySelector('.trip-events');
-render(siteEventsElement, sortingForm(), 'afterbegin');
-
-const siteEventsListElement = document.querySelector('.trip-events__list');
-render(siteEventsListElement, newPointForm(), 'beforeend');
-
-for (let i = 0; i < POINTS_COUNT; i++) {
-  render(siteEventsListElement, tripPoint(), 'beforeend');
-}
-
-render(siteEventsListElement, editTripPointForm(), 'beforeend');
+tripPresenter.init(generatedPoints);
