@@ -31,7 +31,6 @@ const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filt
 tripPresenter.init();
 
 const siteMenuComponent = new SiteMenuView();
-render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
 
 let statisticsComponent = null;
 let currentMenuItem = MenuItem.POINTS;
@@ -56,8 +55,6 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
-siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-
 document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
   evt.preventDefault();
   remove(statisticsComponent);
@@ -74,7 +71,11 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
 api.getPoints()
   .then((points) => {
     pointsModel.setPoints(UpdateType.INIT, points);
+    render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   })
   .catch(() => {
     pointsModel.setPoints(UpdateType.INIT, []);
+    render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
   });
