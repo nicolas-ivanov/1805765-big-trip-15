@@ -204,11 +204,22 @@ export default class PointEditView extends SmartView {
 
 
   static parsePointToData(point) {
-    const pointData = Object.assign({}, point);
+    const pointData = Object.assign(
+      {},
+      point,
+      {
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
     return pointData;
   }
 
   static parseDataToPoint(data) {
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+
     return Object.assign({}, data);
   }
 
@@ -257,8 +268,13 @@ export default class PointEditView extends SmartView {
   }
 
   getTemplate () {
-    const start = this._data.startTime;
-    const end = this._data.endTime;
+    const {
+      startTime,
+      endTime,
+      isDisabled,
+      isSaving,
+      isDeleting,
+    } = this._data;
 
     return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -325,7 +341,7 @@ export default class PointEditView extends SmartView {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${this._data.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
         <datalist id="destination-list-1">
           ${cities.map((city) => (`<option value="${  city.name  }"></option>`)).join('')}
         </datalist>
@@ -333,10 +349,10 @@ export default class PointEditView extends SmartView {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(start, 'DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(startTime, 'DD/MM/YY HH:mm')}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(end, 'DD/MM/YY HH:mm')}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(endTime, 'DD/MM/YY HH:mm')}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -347,8 +363,8 @@ export default class PointEditView extends SmartView {
         <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${this._data.basePrice || ''}">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit" ${this._isSubmitEnabled ? '' : 'disabled'}>${isSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" type="reset">${isDeleting ? 'deleting...' : 'delete'}</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>
