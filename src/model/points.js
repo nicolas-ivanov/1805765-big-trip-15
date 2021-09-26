@@ -53,4 +53,55 @@ export default class Points extends AbstractObserver {
 
     this._notify(updateType);
   }
+
+  static adaptToClient(point) {
+    const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        startTime: point['date_from'] !== null ? new Date(point['date_from']) : point['date_from'],
+        endTime: point['date_to'] !== null ? new Date(point['date_to']) : point['date_to'],
+        basePrice: point['base_price'],
+        isFavorite: point['is_favorite'],
+        pointType: point['type'],
+        description: point['destination'].description,
+        photos: point['destination'].pictures.map((photo) => (photo.src)),
+        destination: point['destination'].name,
+      },
+    );
+
+    // Ненужные ключи мы удаляем
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['is_favorite'];
+    delete adaptedPoint['type'];
+
+    return adaptedPoint;
+  }
+
+  static adaptToServer(point) {
+    const adaptedPoint = Object.assign(
+      {},
+      point,
+      {
+        'date_from': point.startTime instanceof Date ? point.startTime.toISOString() : null,
+        'date_to': point.endTime instanceof Date ? point.endTime.toISOString() : null,
+        'base_price': point.basePrice,
+        'is_favorite': point.isFavorite,
+        'type': point.pointType,
+      },
+    );
+
+    // Ненужные ключи мы удаляем
+    delete adaptedPoint.startTime;
+    delete adaptedPoint.endTime;
+    delete adaptedPoint.basePrice;
+    delete adaptedPoint.isFavorite;
+    delete adaptedPoint.pointType;
+    delete adaptedPoint.photos;
+    delete adaptedPoint.description;
+
+    return adaptedPoint;
+  }
 }

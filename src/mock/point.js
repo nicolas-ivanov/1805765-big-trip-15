@@ -130,7 +130,7 @@ export const extraOptions = {
   ],
 };
 
-const getPhoto = () => `http://picsum.photos/248/152?r=${  Math.random()}`;
+const getPhoto = () => `http://picsum.photos/248/152?r=${ Math.random() }`;
 
 export const cities = [
   {
@@ -193,6 +193,7 @@ const DEFAULT_POINT_TYPE = 'taxi';
 const CURRENT_DATE = getCurrentDate();
 
 export const BLANK_POINT = {
+  id: nanoid(),
   pointType: DEFAULT_POINT_TYPE,
   basePrice: null,
   startTime: CURRENT_DATE,
