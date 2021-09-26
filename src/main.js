@@ -6,7 +6,6 @@ import FilterPresenter from './presenter/filter.js';
 import TripInfoPresenter from './presenter/trip-info.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
-import { generatedPoints } from './mock/point.js';
 import { MenuItem, UpdateType, FilterType } from './const.js';
 import Api from './api.js';
 
@@ -15,18 +14,7 @@ const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
 
-api.getPoints().then((points) => {
-  console.log(points);
-  // Есть проблема: cтруктура объекта похожа, но некоторые ключи называются иначе,
-  // а ещё на сервере используется snake_case, а у нас camelCase.
-  // Можно, конечно, переписать часть нашего клиентского приложения, но зачем?
-  // Есть вариант получше - паттерн "Адаптер"
-});
-
-
 const pointsModel = new PointsModel();
-pointsModel.setPoints(generatedPoints);
-
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.trip-main');
@@ -81,4 +69,8 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
   filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
   tripPresenter.init();
   tripPresenter.createPoint();
+});
+
+api.getPoints().then((points) => {
+  pointsModel.setPoints(points);
 });
