@@ -2,6 +2,7 @@ import PointPresenter from './point.js';
 import PointNewPresenter from './point-new.js';
 import SortingView from '../view/sorting.js';
 import TripPointsListView from '../view/trip-points-list.js';
+import LoadingView from '../view/loading.js';
 import NoPointsView from '../view/no-points.js';
 import { render, RenderPosition, remove} from '../utils/render.js';
 import { SortType, UpdateType, UserAction, FilterType } from '../const.js';
@@ -16,11 +17,13 @@ export default class Trip {
     this._pointPresenter = new Map();
     this._filterType = FilterType.ALL;
     this._currentSortType = SortType.DEFAULT;
+    this._isLoading = true;
 
     this._sortComponent = null;
     this._noPointsComponent = null;
 
     this._pointsListComponent = new TripPointsListView();
+    this._loadingComponent = new LoadingView();
 
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
@@ -94,11 +97,20 @@ export default class Trip {
     this._pointPresenter.set(point.id, pointPresenter);
   }
 
+  _renderLoading() {
+    render(this._tripListContainer, this._loadingComponent, RenderPosition.AFTERBEGIN);
+  }
+
   _renderPoints(points) {
     points.forEach((point) => this._renderPoint(point));
   }
 
   _renderTripList() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     const points = this._getPoints();
     const pointsCount = points.length;
 
@@ -116,6 +128,7 @@ export default class Trip {
     this._pointPresenter.clear();
 
     remove(this._sortComponent);
+    remove(this._loadingComponent);
 
     if (this._noPointsComponent) {
       remove(this._noPointsComponent);
@@ -162,6 +175,11 @@ export default class Trip {
         break;
       case UpdateType.MAJOR:
         this._clearTripList({resetSortType: true});
+        this._renderTripList();
+        break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
         this._renderTripList();
         break;
     }
