@@ -27,7 +27,7 @@ tripInfoPresenter.init();
 const filterPresenter = new FilterPresenter(siteTripControlsElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
+const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel, api);
 tripPresenter.init();
 
 const siteMenuComponent = new SiteMenuView();
