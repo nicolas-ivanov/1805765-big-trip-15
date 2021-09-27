@@ -35,6 +35,10 @@ const siteMenuComponent = new SiteMenuView();
 let statisticsComponent = null;
 let currentMenuItem = MenuItem.POINTS;
 
+const handlePointNewFormClose = () => {
+  document.querySelector('.trip-main__event-add-btn').disabled = false;
+};
+
 const handleSiteMenuClick = (menuItem) => {
   if (menuItem === currentMenuItem) {
     return;
@@ -65,7 +69,8 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
 
   filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
   tripPresenter.init();
-  tripPresenter.createPoint();
+  tripPresenter.createPoint(handlePointNewFormClose);
+  document.querySelector('.trip-main__event-add-btn').disabled = true;
 });
 
 api.getPoints()
