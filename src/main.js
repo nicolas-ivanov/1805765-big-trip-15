@@ -9,7 +9,8 @@ import FilterModel from './model/filter.js';
 import { MenuItem, UpdateType, FilterType } from './const.js';
 import Api from './api.js';
 
-const AUTHORIZATION = 'Basic random_string';
+const token = (Math.random() + 1).toString(36).substring(3);
+const AUTHORIZATION = `Basic ${ token }`;
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
