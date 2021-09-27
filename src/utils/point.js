@@ -19,4 +19,6 @@ export const getTotalPointPrice = (point) => (point.basePrice + getOffersSumPric
 
 export const getTotalPrice = (points) => (points.map((point) => getTotalPointPrice(point))).reduce((acc, a) => acc + a, 0);
 
+export const getTotalPriceWithoutOffers = (points) => (points.map((point) => point.basePrice)).reduce((acc, a) => acc + a, 0);
+
 export const getTotalDuration = (points) => (points.reduce((acc, point) => acc + getDatesDiff(point.endTime, point.startTime), 0));

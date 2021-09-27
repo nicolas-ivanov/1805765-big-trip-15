@@ -1,7 +1,7 @@
 import SmartView from './smart.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import { getTotalPrice, getTotalDuration } from '../utils/point.js';
+import { getTotalPriceWithoutOffers, getTotalDuration } from '../utils/point.js';
 import { simultaneousSort } from '../utils/common.js';
 import { getTimeDiffDisplayFromMSec } from '../utils/date.js';
 
@@ -119,7 +119,7 @@ export default class Statistics extends SmartView {
     const timeCtx = this.getElement().querySelector('#time-spend');
 
     const pointTypes = [... new Set(this._data.map((point) => point.pointType))];
-    const moneyData = pointTypes.map((type) => (getTotalPrice(this._data.filter((point) => point.pointType === type))));
+    const moneyData = pointTypes.map((type) => (getTotalPriceWithoutOffers(this._data.filter((point) => point.pointType === type))));
     const typesCountData = pointTypes.map((type) => (this._data.filter((point) => point.pointType === type)).length);
     const timeSpendData = pointTypes.map((type) => (getTotalDuration(this._data.filter((point) => point.pointType === type))));
 
