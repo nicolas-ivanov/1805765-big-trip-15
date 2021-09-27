@@ -1,11 +1,11 @@
-import { getDatesDiff, getDateHour }  from './date.js';
+import { getDatesDiff }  from './date.js';
 import { extraOptions } from '../mock/point.js';
 
 export const sortByDays = (pointA, pointB) => getDatesDiff(pointA.startTime, pointB.startTime);
 
-export const sortByPrice = (pointA, pointB) => pointA.basePrice - pointB.basePrice;
+export const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
 
-export const sortByTime = (pointA, pointB) => getDateHour(pointA.startTime) - getDateHour(pointB.startTime);
+export const sortByTime = (pointA, pointB) => getDatesDiff(pointB.endTime, pointB.startTime) - getDatesDiff(pointA.endTime, pointA.startTime);
 
 export const sortByEvents = (pointA, pointB) => pointA.pointType.localeCompare(pointB.pointType);
 
