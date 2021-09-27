@@ -9,7 +9,8 @@ import FilterModel from './model/filter.js';
 import { MenuItem, UpdateType, FilterType } from './const.js';
 import Api from './api.js';
 
-const AUTHORIZATION = 'Basic random_string';
+const token = (Math.random() + 1).toString(36).substring(3);
+const AUTHORIZATION = `Basic ${ token }`;
 const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
 
 const api = new Api(END_POINT, AUTHORIZATION);
@@ -34,6 +35,10 @@ const siteMenuComponent = new SiteMenuView();
 
 let statisticsComponent = null;
 let currentMenuItem = MenuItem.POINTS;
+
+const handlePointNewFormClose = () => {
+  document.querySelector('.trip-main__event-add-btn').disabled = false;
+};
 
 const handleSiteMenuClick = (menuItem) => {
   if (menuItem === currentMenuItem) {
@@ -65,7 +70,8 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
 
   filterModel.setFilter(UpdateType.MAJOR, FilterType.ALL);
   tripPresenter.init();
-  tripPresenter.createPoint();
+  tripPresenter.createPoint(handlePointNewFormClose);
+  document.querySelector('.trip-main__event-add-btn').disabled = true;
 });
 
 api.getPoints()

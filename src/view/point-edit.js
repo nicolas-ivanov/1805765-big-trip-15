@@ -79,10 +79,10 @@ export default class PointEditView extends SmartView {
     }
 
     const inputId = evt.target.getAttribute('for');
-    const pType = document.getElementById(inputId).getAttribute('value');
+    const inputElement = document.getElementById(inputId);
 
     this.updateData({
-      pointType: pType,
+      pointType: inputElement.getAttribute('value'),
     });
   }
 
@@ -315,7 +315,7 @@ export default class PointEditView extends SmartView {
             </div>
 
             <div class="event__type-item">
-              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight" checked>
+              <input id="event-type-flight-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="flight">
               <label class="event__type-label  event__type-label--flight" for="event-type-flight-1">Flight</label>
             </div>
 
@@ -341,7 +341,11 @@ export default class PointEditView extends SmartView {
         <label class="event__label  event__type-output" for="event-destination-1">
           ${this._data.pointType}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._data.destination || ''}" list="destination-list-1"
+          pattern="${cities.map((city) => city.name).join('|')}"
+          title='Must be ${cities.map((city) => `"${ city.name }"`).join(' or ')}'
+          ${isDisabled ? 'disabled' : ''}
+        >
         <datalist id="destination-list-1">
           ${cities.map((city) => (`<option value="${  city.name  }"></option>`)).join('')}
         </datalist>
