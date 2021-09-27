@@ -6,12 +6,15 @@ import FilterPresenter from './presenter/filter.js';
 import TripInfoPresenter from './presenter/trip-info.js';
 import PointsModel from './model/points.js';
 import FilterModel from './model/filter.js';
-import { generatedPoints } from './mock/point.js';
 import { MenuItem, UpdateType, FilterType } from './const.js';
+import Api from './api.js';
+
+const AUTHORIZATION = 'Basic random_string';
+const END_POINT = 'https://15.ecmascript.pages.academy/big-trip';
+
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const pointsModel = new PointsModel();
-pointsModel.setPoints(generatedPoints);
-
 const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.trip-main');
@@ -24,11 +27,10 @@ tripInfoPresenter.init();
 const filterPresenter = new FilterPresenter(siteTripControlsElement, filterModel, pointsModel);
 filterPresenter.init();
 
-const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel);
+const tripPresenter = new TripListPresenter(tripListContainer, pointsModel, filterModel, api);
 tripPresenter.init();
 
 const siteMenuComponent = new SiteMenuView();
-render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
 
 let statisticsComponent = null;
 let currentMenuItem = MenuItem.POINTS;
@@ -53,8 +55,6 @@ const handleSiteMenuClick = (menuItem) => {
   }
 };
 
-siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
-
 document.querySelector('.trip-main__event-add-btn').addEventListener('click', (evt) => {
   evt.preventDefault();
   remove(statisticsComponent);
@@ -67,3 +67,15 @@ document.querySelector('.trip-main__event-add-btn').addEventListener('click', (e
   tripPresenter.init();
   tripPresenter.createPoint();
 });
+
+api.getPoints()
+  .then((points) => {
+    pointsModel.setPoints(UpdateType.INIT, points);
+    render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+  })
+  .catch(() => {
+    pointsModel.setPoints(UpdateType.INIT, []);
+    render(siteTripControlsElement, siteMenuComponent, RenderPosition.AFTERBEGIN);
+    siteMenuComponent.setMenuClickHandler(handleSiteMenuClick);
+  });

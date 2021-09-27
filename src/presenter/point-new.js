@@ -1,5 +1,4 @@
 import PointEditView from '../view/point-edit.js';
-import { nanoid } from 'nanoid';
 import { remove, render, RenderPosition } from '../utils/render.js';
 import { UserAction, UpdateType } from '../const.js';
 
@@ -39,15 +38,31 @@ export default class PointNew {
     document.removeEventListener('keydown', this._escKeyDownHandler);
   }
 
+  setSaving() {
+    this._pointEditComponent.updateData({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this._pointEditComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this._pointEditComponent.shake(resetFormState);
+  }
+
   _handleFormSubmit(point) {
     this._changeData(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      // Пока у нас нет сервера, который бы после сохранения
-      // выдывал честный id задачи, нам нужно позаботиться об этом самим
-      Object.assign({id: nanoid()}, point),
+      point,
     );
-    this.destroy();
   }
 
   _handleDeleteClick() {
